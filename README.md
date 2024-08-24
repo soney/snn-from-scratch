@@ -1,3 +1,5 @@
+Visit https://soney.github.io/snn-from-scratch
+
 # Initializing
 
 1. Create a virtual environment in the `.venv` directory.
