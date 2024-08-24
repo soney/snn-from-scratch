@@ -1,0 +1,34 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: chapters/01 - Root
+parts:
+  - chapters:
+    - file: chapters/02 - Textbook
+  - caption: Modeling LIF Neurons
+    chapters:
+    - file: chapters/03 - Basic Neuron Models
+    - file: chapters/04 - First Order LI
+    - file: chapters/05 - Implementing Firing
+    - file: chapters/06 - Firing Rates and Tuning Curves
+    - file: chapters/07 - Synapses
+  - caption: Encoding Information
+    chapters:
+    - file: chapters/08 - Encoding and Decoding Information
+    - file: chapters/09 - Collections of Neurons
+    - file: chapters/10 - Translating Data to Spikes
+    - file: chapters/11 - Representing 2D Images
+  - caption: Scaling Up
+    chapters:
+    - file: chapters/12 - Improving Accuracy
+    - file: chapters/13 - Neuron Collections
+    - file: chapters/14 - Weights and Connections
+  - caption: Learning and Adaptation
+    chapters:
+    - file: chapters/15 - Adaptive LIF Neurons
+    - file: chapters/16 - STDP
+  - caption: Research Replication
+    chapters:
+    - file: chapters/17 - Research Replication 1
+    - file: chapters/18 - Research Replication 2

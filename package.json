@@ -1,0 +1,75 @@
+{
+  "name": "snn-from-scratch",
+  "version": "1.0.0",
+  "description": "Building Spiking Neural Networks (SNNs) from Scratch",
+  "scripts": {
+    "build": "webpack --mode=development --node-env=development && . ./.venv/bin/activate && jupyter-book build . --quiet",
+    "clean": ". ./.venv/bin/activate && jupyter-book clean . --all",
+    "winbuild": "webpack --mode=development --node-env=development && .venv\\Scripts\\activate && jupyter-book build . --quiet",
+    "watch:build": "nodemon --exec 'npm run build'",
+    "watch:winbuild": "nodemon --exec 'npm run winbuild'",
+    "start": "node serve.js --auto-reload",
+    "watch": "concurrently 'npm run watch:build' 'npm run start'",
+    "winwatch": "concurrently 'npm run watch:winbuild' 'npm run start'",
+    "deploy": "gh-pages --nojekyll -d _build/html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soney/snn-from-scratch.git"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "_static/javascript-components.js",
+      "node_modules",
+      ".jupyterlite.doit.db",
+      "ext/component-spec.json",
+      "**/_build/**",
+      "**/docs/**",
+      "_contents/**",
+      "**/*.log"
+    ],
+    "ext": "js,mjs,cjs,json,ts,tsx,css,html,svg,md,ipynb,txt,yml",
+    "delay": 500
+  },
+  "author": "Steve Oney",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chroma-js": "^2.4.4",
+    "@types/d3": "^7.4.3",
+    "@webpack-cli/generators": "^3.0.7",
+    "cheerio": "^1.0.0-rc.12",
+    "chokidar": "^3.6.0",
+    "concurrently": "^8.2.2",
+    "css-loader": "^7.1.0",
+    "express": "^4.19.2",
+    "gh-pages": "^6.1.1",
+    "nodemon": "^3.1.3",
+    "open": "^10.1.0",
+    "prettier": "^3.2.5",
+    "sass": "^1.77.0",
+    "sass-loader": "^14.1.1",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4",
+    "ws": "^8.17.1"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.16.3",
+    "@codemirror/commands": "^6.6.0",
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-python": "^6.1.6",
+    "@codemirror/language": "^6.10.2",
+    "@codemirror/lint": "^6.8.1",
+    "@codemirror/search": "^6.5.6",
+    "@codemirror/state": "^6.4.1",
+    "@codemirror/view": "^6.28.2",
+    "@lezer/highlight": "^1.2.0",
+    "@svgdotjs/svg.js": "^3.2.0",
+    "chroma-js": "^2.4.2",
+    "copy-webpack-plugin": "^12.0.2",
+    "d3": "^7.9.0",
+    "pyodide": "^0.26.1"
+  }
+}

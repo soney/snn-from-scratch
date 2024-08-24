@@ -1,0 +1,16 @@
+.code-output {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.code-output > pre {
+    font-family: monospace;
+    margin: 0px;
+}
+.code-output > pre > .error {
+    background-color: #fdd;
+    color: #c00;
+}
+
+.code-output > pre > .output {
+    opacity: 0.7;
+}

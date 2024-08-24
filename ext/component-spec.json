@@ -1,0 +1,85 @@
+[
+  {
+    "name": "test",
+    "has_content": true,
+    "required_arguments": 0,
+    "optional_arguments": 3,
+    "option_names": [
+      "key1",
+      "key2"
+    ]
+  },
+  {
+    "name": "html-element",
+    "has_content": true,
+    "required_arguments": 1,
+    "optional_arguments": 0,
+    "option_names": [
+      "id",
+      "class",
+      "raw"
+    ]
+  },
+  {
+    "name": "editor",
+    "has_content": true,
+    "required_arguments": 0,
+    "optional_arguments": 1,
+    "option_names": [
+      "packages",
+      "run_on_load",
+      "height",
+      "max_height",
+      "hide_code"
+    ]
+  },
+  {
+    "name": "static-bucket",
+    "has_content": false,
+    "required_arguments": 0,
+    "optional_arguments": 0,
+    "option_names": []
+  },
+  {
+    "name": "leaky-bucket",
+    "has_content": false,
+    "required_arguments": 0,
+    "optional_arguments": 0,
+    "option_names": [
+      "fires",
+      "tau_rc",
+      "button_selector"
+    ]
+  },
+  {
+    "name": "spikes-by-frequency",
+    "has_content": false,
+    "required_arguments": 0,
+    "optional_arguments": 0,
+    "option_names": []
+  },
+  {
+    "name": "scaled-spikes-by-frequency",
+    "has_content": false,
+    "required_arguments": 0,
+    "optional_arguments": 0,
+    "option_names": []
+  },
+  {
+    "name": "poisson-spikes",
+    "has_content": false,
+    "required_arguments": 0,
+    "optional_arguments": 0,
+    "option_names": []
+  },
+  {
+    "name": "image-spikes",
+    "has_content": true,
+    "required_arguments": 0,
+    "optional_arguments": 0,
+    "option_names": [
+      "width",
+      "height"
+    ]
+  }
+]
