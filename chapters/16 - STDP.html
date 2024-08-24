@@ -1,0 +1,1136 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Learning through Spike-Timing Dependent Plasticity (STDP) &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/16 - STDP';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)" href="17%20-%20Research%20Replication%201.html" />
+    <link rel="prev" title="Adaptive LIF Neurons" href="15%20-%20Adaptive%20LIF%20Neurons.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html">Basic Neuron Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04%20-%20First%20Order%20LI.html">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="09%20-%20Collections%20of%20Neurons.html">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="12%20-%20Improving%20Accuracy.html">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="17%20-%20Research%20Replication%201.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/16 - STDP.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/16 - STDP.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Learning through Spike-Timing Dependent Plasticity (STDP)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Learning through Spike-Timing Dependent Plasticity (STDP)</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hebbian-learning">Hebbian Learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spike-timing-dependent-plasticity-stdp">Spike-Timing Dependent Plasticity (STDP)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-rules">Update Rules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-stdp">Implementing STDP</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="learning-through-spike-timing-dependent-plasticity-stdp">
+<h1>Learning through Spike-Timing Dependent Plasticity (STDP)<a class="headerlink" href="#learning-through-spike-timing-dependent-plasticity-stdp" title="Link to this heading">#</a></h1>
+<section id="hebbian-learning">
+<h2>Hebbian Learning<a class="headerlink" href="#hebbian-learning" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Donald_O._Hebb">Donald Hebb</a> was a researcher who tried to understand how synaptic connections between neurons change over time in order to enable learning. Hebb theorized that when two neurons fire at similar times, any synaptic connections between them will be strengthened. Hebbian theory can be summarized as <em>“neurons that fire together wire together”</em>.</p>
+<p>But we need to get more specific; order matters. If we have neurons A and B, and a connection from A to B (A -&gt; B) then this connection would be <strong>strengthened if B fires immediately <em>after</em> A</strong> because it is likely that A caused B to fire. However, <strong>if B fires immediately <em>before</em> A then the connection will be weakened</strong> because A did <em>not</em> cause B to fire.</p>
+</section>
+<section id="spike-timing-dependent-plasticity-stdp">
+<h2>Spike-Timing Dependent Plasticity (STDP)<a class="headerlink" href="#spike-timing-dependent-plasticity-stdp" title="Link to this heading">#</a></h2>
+<p>STDP is a family of update rules for implementing Hebbian learning. Let’s focus on two neurons, which we will call “pre” and “post”. In STDP, if we believe that “pre” <strong>causes</strong> “post” to fire then we strengthen the connection between them so that “post” ends up being even more likely to fire after “pre” fires.</p>
+<p>Let’s focus even more specifically on situations where “pre” and “post” fire at times <span class="math notranslate nohighlight">\(t_{pre}\)</span> and <span class="math notranslate nohighlight">\(t_{post}\)</span> respectively. So if “pre” fires before “post” (<span class="math notranslate nohighlight">\(t_{pre} &lt; t_{post}\)</span>) then the connection between “pre” and “post” should be <em>strengthened</em>; it is likely that “pre” caused “post” to fire. If “pre” fires after “post” (<span class="math notranslate nohighlight">\(t_{pre} \geq t_{post}\)</span>) then the connection between “pre” and “post” should be <em>weakened</em>. Note that we are including simultaneous firing where <span class="math notranslate nohighlight">\(t_{pre} = t_{post}\)</span> because if they fire at the same time, it is unlikely that “pre” caused “post” to fire…but whether that makes sense to do or not depends on the simulation setup (for example, if a presynaptic neuron could cause a postsynaptic neuron to fire on the same timestep in a discrete simulation).</p>
+<p>Let’s define <span class="math notranslate nohighlight">\(w\)</span> to be the weight between “pre” and “post”. If <span class="math notranslate nohighlight">\(w\)</span> is large then “post” will be more likely to fire when “pre” fires (“pre” firing caries more weight/influence on “post”). If <span class="math notranslate nohighlight">\(w\)</span> is small then “pre” has little to no effect on “post”. We could also allow <span class="math notranslate nohighlight">\(w\)</span> to be negative so that if “pre” fires, “post” would be less likely to fire.</p>
+<p>Again, we are only focused on one firing of “pre” (at <span class="math notranslate nohighlight">\(t_{pre}\)</span>) and “post” (at <span class="math notranslate nohighlight">\(t_{post}\)</span>). So now, we ask the question of <strong>how much</strong> our weight <span class="math notranslate nohighlight">\(w\)</span> should change based on the exact values of <span class="math notranslate nohighlight">\(t_{pre}\)</span> and <span class="math notranslate nohighlight">\(t_{post}\)</span>. We will only change our weight after both “pre” and “post” have fired so that we know how to change <span class="math notranslate nohighlight">\(w\)</span>. We’ll refer to the amount we change <span class="math notranslate nohighlight">\(w\)</span> as <span class="math notranslate nohighlight">\(\Delta{}w\)</span>. If <span class="math notranslate nohighlight">\(\Delta{}w\)</span> is positive, we increase the strength of the connection of “pre” to “post” if <span class="math notranslate nohighlight">\(\Delta{}w\)</span> is negative, we decrease the strength.</p>
+<section id="update-rules">
+<h3>Update Rules<a class="headerlink" href="#update-rules" title="Link to this heading">#</a></h3>
+<p>For now, let’s focus on cases where “pre” fires <em>before</em> “post” (<span class="math notranslate nohighlight">\(t_{pre} &lt; t_{post}\)</span>). The more clearly associated “pre” and “post” are, the larger <span class="math notranslate nohighlight">\(\Delta{}w\)</span> should be. If “post” fires <em>immediately</em> after “pre” then it’s fairly likely that “pre” caused “post” to fire so <span class="math notranslate nohighlight">\(\Delta{}w\)</span> should be larger. If “post” fires <em>a long time</em> after “pre” has fired then it’s not likely that “pre” caused “post” to fire (since the influence of the spike decreased over time) so <span class="math notranslate nohighlight">\(\Delta{}w\)</span> should be closer to <span class="math notranslate nohighlight">\(0\)</span>.</p>
+<p>Conversely, if we focus on cases where “pre” fires <em>after</em> “post” (<span class="math notranslate nohighlight">\(t_{pre} \geq t_{post}\)</span>) then <span class="math notranslate nohighlight">\(\Delta{}w\)</span> will be negative. If “pre” fires a long time after “post” then <span class="math notranslate nohighlight">\(\Delta{}w\)</span> should only be slightly negative, since we aren’t necessarily sure what effect “pre” has on “post”. But the closer <span class="math notranslate nohighlight">\(t_{pre}\)</span> is to <span class="math notranslate nohighlight">\(t_{post}\)</span> (while still occuring after), the more negative we can make <span class="math notranslate nohighlight">\(\Delta{}w\)</span>, since we can be more sure that “pre” did <strong>not</strong> cause “post” to fire.</p>
+<p>The effect of “pre” on “post” decays exponentially with time, so it makes sense to make <span class="math notranslate nohighlight">\(\Delta{}w\)</span> also depend on the exponential difference between <span class="math notranslate nohighlight">\(t_{pre}\)</span> and <span class="math notranslate nohighlight">\(t_{post}\)</span>: <span class="math notranslate nohighlight">\(e^{(t_{pre}-t_{post})}\)</span>. Let’s also create time constants to specify how quickly our influence decays. We’ll use <span class="math notranslate nohighlight">\(\tau_{+}\)</span> and <span class="math notranslate nohighlight">\(\tau_{-}\)</span> as time constants to represent how quickly our <span class="math notranslate nohighlight">\(\Delta{}w\)</span> update goes to <span class="math notranslate nohighlight">\(0\)</span> if <span class="math notranslate nohighlight">\(t_{pre} &lt; t_{post}\)</span> or if <span class="math notranslate nohighlight">\(t_{pre} \geq t_{post}\)</span> respectively. We’ll also introduce two constants <span class="math notranslate nohighlight">\(A_{+}\)</span> and <span class="math notranslate nohighlight">\(A_{-}\)</span> to scale <span class="math notranslate nohighlight">\(\Delta{}w\)</span> if <span class="math notranslate nohighlight">\(t_{pre} &lt; t_{post}\)</span> or if <span class="math notranslate nohighlight">\(t_{pre} \geq t_{post}\)</span> respectively.</p>
+<p>So we end up the update rules:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\Delta{}w =
+\begin{cases}
+  A_+e^{\frac{(t_{pre}-t_{post})}{\tau_+}}, &amp; \text{if } t_{pre} &lt; t_{post} \\
+  -A_{-}e^{\frac{-(t_{pre}-t_{post})}{\tau_{-}}}, &amp; \text{if } t_{pre} \geq t_{post}
+\end{cases}
+\end{split}\]</div>
+<p>Let’s graph out the value of <span class="math notranslate nohighlight">\(\Delta{}w\)</span> with respect to <span class="math notranslate nohighlight">\(t_{pre}-t_{post}\)</span>. We’ll first define variables <code class="docutils literal notranslate"><span class="pre">a_plus</span></code> to represent <span class="math notranslate nohighlight">\(A_+\)</span>, <code class="docutils literal notranslate"><span class="pre">a_minus</span></code> to represent <span class="math notranslate nohighlight">\(A_-\)</span>, <code class="docutils literal notranslate"><span class="pre">tau_plus</span></code> to represent <span class="math notranslate nohighlight">\(\tau_+\)</span>, and <code class="docutils literal notranslate"><span class="pre">a_minus</span></code> to represent <span class="math notranslate nohighlight">\(\tau_-\)</span>.</p>
+<p>Our definition of <span class="math notranslate nohighlight">\(\Delta{}w\)</span> is <strong>time-invariant</strong> with respect to <span class="math notranslate nohighlight">\(t_{pre} - t_{post}\)</span>, meaning that it does not depend on the exact time but only the difference between the two times (i.e., if <span class="math notranslate nohighlight">\(t_{pre} - t_{post} = 5\)</span> then it doesn’t matter what the exact value of <span class="math notranslate nohighlight">\(t_{pre}\)</span> was). So let’s graph out <span class="math notranslate nohighlight">\(\Delta{}w\)</span> with respect to <span class="math notranslate nohighlight">\(t_{pre} - t_{post}\)</span>:</p>
+<p>We’ll define the function <code class="docutils literal notranslate"><span class="pre">getDW</span></code> to accept two inputs that represent <span class="math notranslate nohighlight">\(t_{pre}\)</span> and <span class="math notranslate nohighlight">\(t_{post}\)</span> (<code class="docutils literal notranslate"><span class="pre">t_pre</span></code> and <code class="docutils literal notranslate"><span class="pre">t_post</span></code> respectively) and return <span class="math notranslate nohighlight">\(\Delta{}w\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">getDW</span><span class="p">(</span><span class="n">t_pre</span><span class="p">,</span> <span class="n">t_post</span><span class="p">,</span> <span class="n">a_plus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">tau_plus</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">a_minus</span><span class="o">=</span><span class="mf">0.011</span><span class="p">,</span> <span class="n">tau_minus</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">t_pre</span> <span class="o">&lt;=</span> <span class="n">t_post</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">a_plus</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">t_pre</span> <span class="o">-</span> <span class="n">t_post</span><span class="p">)</span><span class="o">/</span><span class="n">tau_plus</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="n">a_minus</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t_pre</span> <span class="o">-</span> <span class="n">t_post</span><span class="p">)</span><span class="o">/</span><span class="n">tau_minus</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And plot it’s value (note that since <code class="docutils literal notranslate"><span class="pre">getDW</span></code> is time invariant, we’re just going to leave <span class="math notranslate nohighlight">\(t_{post}\)</span> fixed at <code class="docutils literal notranslate"><span class="pre">0</span></code> and vary <span class="math notranslate nohighlight">\(t_{pre}\)</span>):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">t_pre</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">t_post</span> <span class="o">=</span> <span class="mi">00</span>
+<span class="n">dw</span> <span class="o">=</span> <span class="p">[</span><span class="n">getDW</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t_post</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">t_pre</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_pre</span><span class="p">,</span> <span class="n">dw</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;t_pre - t_post&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;dw&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/ec15f98faf5558c1b6d3e4dafb9c77f41fdf270dfaf2d7116e67c4355308d991.png" src="../_images/ec15f98faf5558c1b6d3e4dafb9c77f41fdf270dfaf2d7116e67c4355308d991.png" />
+</div>
+</div>
+<div class="cell tag_hide-input tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">STDPWeights</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">,</span> <span class="n">tau_plus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_minus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">a_plus</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">a_minus</span> <span class="o">=</span> <span class="mf">0.011</span><span class="p">,</span> <span class="n">g_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">g_max</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPre</span> <span class="o">=</span> <span class="n">numPre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPost</span> <span class="o">=</span> <span class="n">numPost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span> <span class="o">=</span> <span class="n">tau_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span> <span class="o">=</span> <span class="n">tau_minus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_plus</span> <span class="o">=</span> <span class="n">a_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_minus</span> <span class="o">=</span> <span class="n">a_minus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPre</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPost</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="o">=</span> <span class="n">g_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">=</span> <span class="n">g_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">))</span> <span class="c1"># A 2-D array; numPre x numPost zeros (normally would be random)</span>
+
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">updateWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preOutputs</span><span class="p">,</span> <span class="n">postOutputs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="p">(</span><span class="n">preOutputs</span>  <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-=</span> <span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_minus</span>
+
+        <span class="n">alpha_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="c1"># Scaling factor for weight updates</span>
+
+        <span class="n">preSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">preOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># Indices of pre-synaptic   spiking neurons</span>
+        <span class="n">postSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">preSpikeIndices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">postSpikeIndices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell tag_hide-input tag_hide-cell docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell content</span>
+<span class="expanded">Hide code cell content</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">SIM_PER_TIME</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="k">def</span> <span class="nf">str2spikes</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dt_per_char</span><span class="o">=</span><span class="n">SIM_PER_TIME</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">max_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="n">max_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="n">spikes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_length</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">offset</span><span class="p">):</span>
+            <span class="n">spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">and</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dt_per_char</span> <span class="o">-</span> <span class="n">offset</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">spikes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">spikes</span>
+
+<span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">arr</span><span class="p">[:]</span>
+
+<span class="k">def</span> <span class="nf">clone2d</span><span class="p">(</span><span class="n">arr</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">clone</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">arr</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">plotDWView</span><span class="p">(</span><span class="n">pre_spike_strs</span><span class="p">,</span> <span class="n">post_spike_strs</span><span class="p">,</span> <span class="n">show_w</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="p">{},</span> <span class="n">gmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">gmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_plus</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">tau_minus</span><span class="o">=</span><span class="mf">20.0</span><span class="p">,</span> <span class="n">a_plus</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">a_minus</span><span class="o">=</span><span class="mf">0.011</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+        
+    <span class="n">max_length_string</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">pre_spike_strs</span><span class="o">+</span><span class="n">post_spike_strs</span><span class="p">)</span>
+    <span class="n">pre_spikes</span>  <span class="o">=</span> <span class="p">[</span><span class="n">str2spikes</span><span class="p">(</span><span class="n">ps</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_length_string</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">),</span> <span class="n">offset</span><span class="o">=</span><span class="n">offsets</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="n">idx</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pre_spike_strs</span><span class="p">)]</span>
+    <span class="n">post_spikes</span> <span class="o">=</span> <span class="p">[</span><span class="n">str2spikes</span><span class="p">(</span><span class="n">ps</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_length_string</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">),</span> <span class="n">offset</span><span class="o">=</span><span class="n">offsets</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="n">idx</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ps</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">post_spike_strs</span><span class="p">)]</span>
+
+    <span class="n">all_spikes</span> <span class="o">=</span> <span class="n">pre_spikes</span> <span class="o">+</span> <span class="n">post_spikes</span>
+
+    <span class="n">padding</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;display&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;padding&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">label_width</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">padding_left</span> <span class="o">=</span> <span class="n">padding</span> <span class="o">+</span> <span class="n">label_width</span> <span class="o">+</span> <span class="n">padding</span>
+    <span class="n">padding_between_spike_view</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">padding_between_graphs</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">padding_between_weight_view</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="n">per_spike_height</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">per_graph_height</span> <span class="o">=</span> <span class="mi">70</span>
+    <span class="n">per_w_height</span> <span class="o">=</span> <span class="mi">100</span> <span class="k">if</span> <span class="n">show_w</span> <span class="k">else</span> <span class="mi">0</span>
+    
+    <span class="n">num_pre_neurons</span>  <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pre_spikes</span><span class="p">)</span>
+    <span class="n">num_post_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">post_spikes</span><span class="p">)</span>
+    
+    <span class="n">spike_display_height</span> <span class="o">=</span> <span class="n">per_spike_height</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_pre_neurons</span> <span class="o">+</span> <span class="n">num_post_neurons</span><span class="p">)</span>
+    <span class="n">graph_display_height</span> <span class="o">=</span> <span class="n">per_graph_height</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_pre_neurons</span> <span class="o">+</span> <span class="n">num_post_neurons</span><span class="p">)</span>
+    <span class="n">dw_display_height</span> <span class="o">=</span> <span class="p">(</span><span class="n">per_w_height</span> <span class="o">+</span> <span class="n">padding_between_weight_view</span><span class="p">)</span> <span class="o">*</span> <span class="n">num_post_neurons</span>
+    
+    <span class="n">height</span> <span class="o">=</span> <span class="n">spike_display_height</span> <span class="o">+</span> <span class="n">graph_display_height</span> <span class="o">+</span> <span class="n">padding_between_spike_view</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_pre_neurons</span> <span class="o">+</span> <span class="n">num_post_neurons</span><span class="p">)</span> <span class="o">+</span> <span class="n">dw_display_height</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">padding</span> <span class="o">+</span> <span class="n">padding_between_graphs</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_pre_neurons</span> <span class="o">+</span> <span class="n">num_post_neurons</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;display&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+    
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="n">height</span> <span class="o">/</span> <span class="mi">100</span><span class="p">))</span>
+    
+    <span class="n">all_spikes</span> <span class="o">=</span> <span class="n">pre_spikes</span> <span class="o">+</span> <span class="n">post_spikes</span>
+    
+    <span class="n">sim_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">all_spikes</span><span class="p">)</span>
+    
+    <span class="c1"># Initialize weights and other variables</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sim_time</span><span class="p">,</span> <span class="n">num_pre_neurons</span><span class="p">))</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sim_time</span><span class="p">,</span> <span class="n">num_post_neurons</span><span class="p">))</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">sim_time</span><span class="p">,</span> <span class="n">num_pre_neurons</span><span class="p">,</span> <span class="n">num_post_neurons</span><span class="p">))</span>
+    
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">/</span> <span class="n">SIM_PER_TIME</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">STDPWeights</span><span class="p">(</span><span class="n">num_pre_neurons</span><span class="p">,</span> <span class="n">num_post_neurons</span><span class="p">,</span> <span class="n">tau_plus</span><span class="o">=</span><span class="n">tau_plus</span><span class="p">,</span> <span class="n">tau_minus</span><span class="o">=</span><span class="n">tau_minus</span><span class="p">,</span> <span class="n">a_plus</span><span class="o">=</span><span class="n">a_plus</span><span class="p">,</span> <span class="n">a_minus</span><span class="o">=</span><span class="n">a_minus</span><span class="p">,</span> <span class="n">g_min</span><span class="o">=</span><span class="n">gmin</span><span class="p">,</span> <span class="n">g_max</span><span class="o">=</span><span class="n">gmax</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sim_time</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">preSpikes</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">pre_spikes</span><span class="p">])</span>
+        <span class="n">postSpikes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">post_spikes</span><span class="p">])</span>
+
+        <span class="n">weights</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>
+        <span class="n">weights</span><span class="o">.</span><span class="n">updateWeights</span><span class="p">(</span><span class="n">preSpikes</span><span class="p">,</span> <span class="n">postSpikes</span><span class="p">)</span>
+
+        <span class="n">x</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">clone</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="n">w</span><span class="p">[</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">clone2d</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">w</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="o">.</span><span class="n">w</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_pre_neurons</span><span class="p">,</span> <span class="n">num_post_neurons</span><span class="p">))</span>
+    
+    
+    <span class="n">spike_scale_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">padding_left</span><span class="p">,</span> <span class="n">width</span> <span class="o">+</span> <span class="n">padding</span><span class="p">,</span> <span class="n">sim_time</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pre_neurons</span> <span class="o">+</span> <span class="n">num_post_neurons</span><span class="p">):</span>
+        <span class="n">is_pre_synaptic</span> <span class="o">=</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">num_pre_neurons</span>
+        <span class="n">is_post_synaptic</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">is_pre_synaptic</span>
+        <span class="n">spikes</span> <span class="o">=</span> <span class="n">all_spikes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">neuron_index</span> <span class="o">=</span> <span class="n">i</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="n">i</span> <span class="o">-</span> <span class="n">num_pre_neurons</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;tab10&#39;</span><span class="p">)(</span><span class="n">neuron_index</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="mi">9</span> <span class="o">-</span> <span class="p">(</span><span class="n">neuron_index</span> <span class="o">%</span> <span class="mi">10</span><span class="p">))</span>
+        <span class="n">y_loc</span> <span class="o">=</span> <span class="n">padding</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">per_spike_height</span> <span class="o">+</span> <span class="n">per_graph_height</span> <span class="o">+</span> <span class="n">padding_between_graphs</span> <span class="o">+</span> <span class="n">padding_between_spike_view</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">is_post_synaptic</span> <span class="o">*</span> <span class="p">(</span><span class="n">per_w_height</span> <span class="o">+</span> <span class="n">padding_between_weight_view</span><span class="p">)</span> <span class="o">*</span> <span class="n">neuron_index</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Rectangle</span><span class="p">((</span><span class="n">padding</span><span class="p">,</span> <span class="n">y_loc</span><span class="p">),</span> <span class="n">label_width</span><span class="p">,</span> <span class="n">per_spike_height</span> <span class="o">+</span> <span class="n">per_graph_height</span> <span class="o">+</span> <span class="n">padding_between_spike_view</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="p">(</span><span class="n">per_w_height</span> <span class="o">+</span> <span class="n">padding_between_weight_view</span><span class="p">)),</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;#333&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;#EEE&#39;</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="s1">&#39;#777&#39;</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">padding</span> <span class="o">+</span> <span class="n">label_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">y_loc</span> <span class="o">+</span> <span class="p">(</span><span class="n">per_spike_height</span> <span class="o">+</span> <span class="n">per_graph_height</span> <span class="o">+</span> <span class="n">padding_between_spike_view</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="p">(</span><span class="n">per_w_height</span> <span class="o">+</span> <span class="n">padding_between_weight_view</span><span class="p">)))</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;pre&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">is_pre_synaptic</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;post&#39;</span><span class="si">}</span><span class="s2"> #</span><span class="si">{</span><span class="n">neuron_index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#333&#39;</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="s1">&#39;#EEE&#39;</span><span class="p">)</span>
+        
+        <span class="n">spike_times</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">spike</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spikes</span><span class="p">)</span> <span class="k">if</span> <span class="n">spike</span><span class="p">]</span>
+
+        
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">spike_times</span><span class="p">:</span>
+            <span class="n">display_x</span> <span class="o">=</span> <span class="n">spike_scale_x</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">display_x</span><span class="p">,</span> <span class="n">display_x</span><span class="p">],</span> <span class="p">[</span><span class="n">y_loc</span><span class="p">,</span> <span class="n">y_loc</span> <span class="o">+</span> <span class="n">per_spike_height</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">display_x</span><span class="p">,</span> <span class="n">display_x</span><span class="p">],</span> <span class="p">[</span><span class="n">y_loc</span><span class="p">,</span> <span class="n">height</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">)))</span>
+
+        
+        <span class="n">trace_var</span> <span class="o">=</span> <span class="n">x</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="n">y</span>
+        <span class="n">trace_val</span> <span class="o">=</span> <span class="n">trace_var</span><span class="p">[:,</span> <span class="n">neuron_index</span><span class="p">]</span>
+        <span class="n">max_trace_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">trace_val</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">spike_scale_x</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">trace_val</span><span class="p">)],</span> <span class="o">-</span><span class="n">trace_val</span><span class="o">*</span><span class="p">(</span><span class="n">per_graph_height</span> <span class="o">/</span> <span class="n">max_trace_val</span><span class="p">)</span> <span class="o">+</span> <span class="n">y_loc</span> <span class="o">+</span> <span class="n">per_spike_height</span> <span class="o">+</span> <span class="n">padding_between_spike_view</span> <span class="o">+</span> <span class="p">(</span><span class="n">per_graph_height</span> <span class="k">if</span> <span class="n">is_pre_synaptic</span> <span class="k">else</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">is_post_synaptic</span> <span class="ow">and</span> <span class="n">show_w</span><span class="p">:</span>
+            <span class="n">max_prepost_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">w</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">neuron_index</span><span class="p">]))</span>
+            <span class="k">for</span> <span class="n">pre_neuron_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_pre_neurons</span><span class="p">):</span>
+                <span class="n">pre_color</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;tab10&#39;</span><span class="p">)(</span><span class="n">pre_neuron_index</span><span class="p">)</span>
+                <span class="n">prepost_w</span> <span class="o">=</span> <span class="n">w</span><span class="p">[:,</span> <span class="n">pre_neuron_index</span><span class="p">,</span> <span class="n">neuron_index</span><span class="p">]</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">spike_scale_x</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">prepost_w</span><span class="p">)],</span> <span class="o">-</span><span class="n">prepost_w</span><span class="o">*</span><span class="p">(</span><span class="n">per_w_height</span> <span class="o">/</span> <span class="n">max_prepost_w</span><span class="p">)</span> <span class="o">+</span> <span class="n">y_loc</span> <span class="o">+</span> <span class="n">per_graph_height</span> <span class="o">+</span> <span class="n">per_spike_height</span> <span class="o">+</span> <span class="n">per_w_height</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">padding_between_spike_view</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">pre_color</span><span class="p">)</span>
+    
+    <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span> 
+    
+    <span class="c1"># remove axis</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># remove ticks</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelbottom</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">left</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="implementing-stdp">
+<h1>Implementing STDP<a class="headerlink" href="#implementing-stdp" title="Link to this heading">#</a></h1>
+<p>Let’s actually implement STDP in code. We are going to define a class <code class="docutils literal notranslate"><span class="pre">STDPWeights</span></code>. When working with large numbers of spikes, it would not be computationally efficient to call a function like <code class="docutils literal notranslate"><span class="pre">getDW</span></code> with every combination of spikes. Instead, we can do something that is equivalent but much more efficient by tracking two variables: <span class="math notranslate nohighlight">\(x[t]\)</span> to represent the presynaptic neuron and <span class="math notranslate nohighlight">\(y[t]\)</span> to represent the postsynaptic neuron. <span class="math notranslate nohighlight">\(x[t]\)</span> and <span class="math notranslate nohighlight">\(y[t]\)</span> decay according to the time constants <span class="math notranslate nohighlight">\(\tau_{+}\)</span> and <span class="math notranslate nohighlight">\(\tau_{-}\)</span> respectively:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x[t+1] = x[t]e^{-\frac{\Delta{}T}{\tau_{+}}}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(y[t+1] = y[t]e^{-\frac{\Delta{}T}{\tau_{-}}}\)</span></p></li>
+</ul>
+<p>Let’s define our <code class="docutils literal notranslate"><span class="pre">STDPWeights</span></code> class, with arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">numPre</span></code>: the number of presynaptic neurons</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">numPost</span></code>: the number of postsynaptic neurons</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tau_plus</span></code>: to represent <span class="math notranslate nohighlight">\(\tau_{+}\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tau_minus</span></code>: to represent <span class="math notranslate nohighlight">\(\tau_{-}\)</span></p></li>
+</ul>
+<p>It also has instance variables to track <code class="docutils literal notranslate"><span class="pre">numPre</span></code>, <code class="docutils literal notranslate"><span class="pre">numPost</span></code>, <code class="docutils literal notranslate"><span class="pre">tau_plus</span></code>, and <code class="docutils literal notranslate"><span class="pre">tau_minus</span></code>. It has instance variables <code class="docutils literal notranslate"><span class="pre">self.x</span></code> and <code class="docutils literal notranslate"><span class="pre">self.y</span></code> to represent the current values of <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">STDPWeights</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">,</span> <span class="n">tau_plus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_minus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPre</span> <span class="o">=</span> <span class="n">numPre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPost</span> <span class="o">=</span> <span class="n">numPost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span> <span class="o">=</span> <span class="n">tau_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span> <span class="o">=</span> <span class="n">tau_minus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPre</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPost</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then, we can update both when a neuron spikes:</p>
+<ul class="simple">
+<li><p>when the pre-synaptic neuron spikes, we increment <span class="math notranslate nohighlight">\(x(t)\)</span> by <span class="math notranslate nohighlight">\(x(t) = x(t) + A_{+}\)</span></p></li>
+<li><p>when the post-synaptic neuron spikes, we increment <span class="math notranslate nohighlight">\(y(t)\)</span> by <span class="math notranslate nohighlight">\(y(t) = y(t) - A_{-}\)</span></p></li>
+</ul>
+<p>Let’s first augment our constructor to include more arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">a_plus</span></code>: to represent <span class="math notranslate nohighlight">\(A_{+}\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">a_minus</span></code>: to represent <span class="math notranslate nohighlight">\(A_{-}\)</span></p></li>
+</ul>
+<p>And let’s add a new function to update <code class="docutils literal notranslate"><span class="pre">self.x</span></code> and <code class="docutils literal notranslate"><span class="pre">self.y</span></code> in reaction to pre-synaptic and post-synaptic spikes. We’ll call this <code class="docutils literal notranslate"><span class="pre">updateWeights</span></code> (we’ll <em>actually</em> update the weights later on). It will accept two arguments: the pre-synaptic outputs (a list of numbers like <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">1]</span></code> to represent the output of three neurons, with the third one firing) and the post-synaptic outputs (in the same format).</p>
+<p>The first things we will do is to find the <em>indices</em> of the spiking neurons. For example, if our outputs are <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">0]</span></code> then we want to get <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2]</span></code> (the indices of the values greater than zero).</p>
+<p>And then we increment those rules for each value:</p>
+<ul class="simple">
+<li><p>when the pre-synaptic neuron spikes, increment that item in <code class="docutils literal notranslate"><span class="pre">self.x</span></code> by <code class="docutils literal notranslate"><span class="pre">self.a_plus</span></code></p></li>
+<li><p>when the post-synaptic neuron spikes, increment that item in <code class="docutils literal notranslate"><span class="pre">self.y</span></code> by <code class="docutils literal notranslate"><span class="pre">-self.a_minus</span></code></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">updateWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preOutputs</span><span class="p">,</span> <span class="n">postOutputs</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="p">(</span><span class="n">preOutputs</span>  <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_plus</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-=</span> <span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_minus</span>
+</pre></div>
+</div>
+<p>Let’s see what this looks like for some example spike trains. Let’s look at how a pre-synaptic neuron looks. Every time it spikes, <span class="math notranslate nohighlight">\(x(t)\)</span> increments (spikes are blue lines and the plot below shows <span class="math notranslate nohighlight">\(x(t)\)</span>):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotDWView</span><span class="p">([</span><span class="s1">&#39;   x x  x x          x&#39;</span><span class="p">],</span> <span class="p">[],</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/d47268004d8d99f81fb092a6e95978e7ebe7ca494341a904c395011638a5d70f.png" src="../_images/d47268004d8d99f81fb092a6e95978e7ebe7ca494341a904c395011638a5d70f.png" />
+</div>
+</div>
+<p>Conversely, when a post-synaptic neuron spikes, <span class="math notranslate nohighlight">\(y(t)\)</span> decrements:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotDWView</span><span class="p">([],</span> <span class="p">[</span><span class="s1">&#39; xxx   x       x&#39;</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/50875275fadecc86ae0dbaed1a0d2d816d99622ede568b2e233d1248975e2a22.png" src="../_images/50875275fadecc86ae0dbaed1a0d2d816d99622ede568b2e233d1248975e2a22.png" />
+</div>
+</div>
+<p>Now, suppose we have a pre-synaptic neuron and a post-synaptic neuron. There is some synaptic weight <span class="math notranslate nohighlight">\(w(t)\)</span> that varies over time. We first assume that the synaptic conductance must be in the range <span class="math notranslate nohighlight">\([g_{min}, g_{max}]\)</span>. We can initialize it randomly within that range. We’ll then scale our updates by the difference, <span class="math notranslate nohighlight">\(\alpha_g = g_{max} - g_{min}\)</span>.</p>
+<ul class="simple">
+<li><p>when the pre-synaptic neuron spikes, we increment every post-synaptic weight <span class="math notranslate nohighlight">\(w(t)\)</span> by <span class="math notranslate nohighlight">\(w(t) = w(t) + \alpha_g y(t)\)</span></p></li>
+<li><p>when the post-synaptic neuron spikes, we increment every pre-synaptic weight <span class="math notranslate nohighlight">\(w(t)\)</span> by <span class="math notranslate nohighlight">\(w(t) = w(t) + \alpha_g x(t)\)</span></p></li>
+</ul>
+<p>So let’s update our <code class="docutils literal notranslate"><span class="pre">STDPWeights</span></code> class. First, we will add two additional constructor arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">g_min</span></code> to represent <span class="math notranslate nohighlight">\(g_{min}\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">g_max</span></code> to represent <span class="math notranslate nohighlight">\(g_{max}\)</span></p></li>
+</ul>
+<p>And let’s create a 2-D array, <code class="docutils literal notranslate"><span class="pre">self.w</span></code>, to represent the weights from each pre-synaptic neuron to each post-synaptic neuron. Our 2-D array will have <code class="docutils literal notranslate"><span class="pre">numPre</span></code> items, each item being a list of <code class="docutils literal notranslate"><span class="pre">numPost</span></code> numbers. So if we want the weight of the synapse from pre-synaptic neuron <code class="docutils literal notranslate"><span class="pre">i</span></code> to post-synaptic neuron <code class="docutils literal notranslate"><span class="pre">j</span></code>, we will access it via <code class="docutils literal notranslate"><span class="pre">self.w[i][j]</span></code>. Normally, we would initialize it randomly between <code class="docutils literal notranslate"><span class="pre">self.g_min</span></code> and <code class="docutils literal notranslate"><span class="pre">this.g_max</span></code> but it’s a little easier to visualize if we instead initialize it to <code class="docutils literal notranslate"><span class="pre">0</span></code> so we’ll do that instead.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">STDPWeights</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">,</span> <span class="n">tau_plus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_minus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">a_plus</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">a_minus</span> <span class="o">=</span> <span class="mf">0.011</span><span class="p">,</span> <span class="n">g_min</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">g_max</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPre</span> <span class="o">=</span> <span class="n">numPre</span>
+        <span class="c1"># ...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPost</span><span class="p">)</span>
+
+        <span class="c1"># vvv ADDED vvv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="o">=</span> <span class="n">g_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">=</span> <span class="n">g_max</span>
+        <span class="c1"># self.w = np.random.uniform(g_min, g_max, (numPre, numPost))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">))</span> <span class="c1"># A 2-D array; numPre x numPost zeros (normally would be random)</span>
+        <span class="c1"># ^^^ ADDED ^^^</span>
+</pre></div>
+</div>
+<p>And then we want to update our <code class="docutils literal notranslate"><span class="pre">updateWeights</span></code> method to specify that whenever a pre-synaptic  neuron fires, we should update the weights of all the post-synaptic neurons connected to it by adding that post-synapic neuron’s <code class="docutils literal notranslate"><span class="pre">y</span></code> value multiplied by <code class="docutils literal notranslate"><span class="pre">this.g_max</span> <span class="pre">-</span> <span class="pre">this.g_min</span></code> (which we defined as <span class="math notranslate nohighlight">\(\alpha_g\)</span> above). We also need additional code to ensure that the weight is between <code class="docutils literal notranslate"><span class="pre">self.g_min</span></code> and <code class="docutils literal notranslate"><span class="pre">self.g_max</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">alpha_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="c1"># Scaling factor for weight updates</span>
+
+<span class="n">preSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">preOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># Indices of pre-synaptic   spiking neurons</span>
+<span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">preSpikeIndices</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>…and conversely, when a post-synaptic neuron spikes, we update the weights of every pre-synaptic neuron connected to it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">postSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">postSpikeIndices</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>So the resulting code is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">STDPWeights</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">,</span> <span class="n">tau_plus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_minus</span> <span class="o">=</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">a_plus</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">a_minus</span> <span class="o">=</span> <span class="mf">0.011</span><span class="p">,</span> <span class="n">g_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">g_max</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPre</span> <span class="o">=</span> <span class="n">numPre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPost</span> <span class="o">=</span> <span class="n">numPost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span> <span class="o">=</span> <span class="n">tau_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span> <span class="o">=</span> <span class="n">tau_minus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_plus</span> <span class="o">=</span> <span class="n">a_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_minus</span> <span class="o">=</span> <span class="n">a_minus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPre</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPost</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="o">=</span> <span class="n">g_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">=</span> <span class="n">g_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">))</span> <span class="c1"># A 2-D array; numPre x numPost zeros (normally would be random)</span>
+
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">updateWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preOutputs</span><span class="p">,</span> <span class="n">postOutputs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="p">(</span><span class="n">preOutputs</span>  <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-=</span> <span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_minus</span>
+
+        <span class="n">alpha_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="c1"># Scaling factor for weight updates</span>
+
+        <span class="n">preSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">preOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># Indices of pre-synaptic   spiking neurons</span>
+        <span class="n">postSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">preSpikeIndices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">postSpikeIndices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s see what this looks like:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotDWView</span><span class="p">([</span><span class="s1">&#39;x  x x  x x          x&#39;</span><span class="p">],</span>
+           <span class="p">[</span><span class="s1">&#39; xx    x       x&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/b9fccf47d152d274cd298c46108e7bc9f3d71ca194282950d2f2d31c3cc24933.png" src="../_images/b9fccf47d152d274cd298c46108e7bc9f3d71ca194282950d2f2d31c3cc24933.png" />
+</div>
+</div>
+<p>If our post-synaptic neuron tends to spike <em>right after</em> our pre-synaptic neuron, the connection between the two strengthens:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotDWView</span><span class="p">([</span><span class="s1">&#39;x  x  x  x  x  x  x&#39;</span><span class="p">],</span>
+           <span class="p">[</span><span class="s1">&#39;x  x  x  x  x  x  x&#39;</span><span class="p">],</span> <span class="n">offsets</span><span class="o">=</span><span class="p">{(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">30</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/7acd74ac01079a5dfec60be87f012e2f65471675b1e6d4b3d74bf363a3b300d2.png" src="../_images/7acd74ac01079a5dfec60be87f012e2f65471675b1e6d4b3d74bf363a3b300d2.png" />
+</div>
+</div>
+<p>If our post-synaptic neuron tends to spike <em>right before</em> our pre-synaptic neuron, the connection between the two weakens (here, setting <code class="docutils literal notranslate"><span class="pre">g_min</span></code> to <code class="docutils literal notranslate"><span class="pre">-1</span></code> so that the weight can be negative):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotDWView</span><span class="p">([</span><span class="s1">&#39;x  x  x  x  x  x  x&#39;</span><span class="p">],</span>
+           <span class="p">[</span><span class="s1">&#39;x  x  x  x  x  x  x&#39;</span><span class="p">],</span> <span class="n">offsets</span><span class="o">=</span><span class="p">{(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">20</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">},</span> <span class="n">gmin</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/0d2776fc0fedacb05329cd2a0d12d0e11a450026847bf061c7056011b3ee06f0.png" src="../_images/0d2776fc0fedacb05329cd2a0d12d0e11a450026847bf061c7056011b3ee06f0.png" />
+</div>
+</div>
+<p>If we have multiple pre-synaptic neurons, the post synaptic neuron will have multiple weights (each weight associated with a given pre-synaptic neuron):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotDWView</span><span class="p">(</span>
+  <span class="c1"># Pre-synaptic spikes</span>
+  <span class="p">[</span>
+    <span class="s2">&quot;x  x x  x x          x&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;  x x   xxx     x     &quot;</span><span class="p">,</span>
+  <span class="p">],</span>
+  <span class="c1"># Post-synaptic spikes</span>
+  <span class="p">[</span>
+    <span class="s2">&quot; xx    x       x       &quot;</span><span class="p">,</span>
+    <span class="s2">&quot; x   x     x           &quot;</span><span class="p">,</span>
+  <span class="p">],</span> <span class="n">offsets</span><span class="o">=</span><span class="p">{(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;pre&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">20</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="mi">20</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/6c417ab865def7b6d435a73bcb9bbf494be680b215a476c127c0a77c4f321766.png" src="../_images/6c417ab865def7b6d435a73bcb9bbf494be680b215a476c127c0a77c4f321766.png" />
+</div>
+</div>
+<p>Try changing the values of <code class="docutils literal notranslate"><span class="pre">a_plus</span></code>, <code class="docutils literal notranslate"><span class="pre">a_minus</span></code>, <code class="docutils literal notranslate"><span class="pre">tau_plus</span></code>, and <code class="docutils literal notranslate"><span class="pre">tau_minus</span></code>, <code class="docutils literal notranslate"><span class="pre">g_min</span></code>, and <code class="docutils literal notranslate"><span class="pre">g_max</span></code> to see how the weights change.</p>
+<div class="custom---editor"
+                                          data-arguments = "[&quot;python&quot;]"
+                                          data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;600px&quot;}"
+                                          data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\n\na_plus    = 0.010 #<-SLIDE(0.001 to 0.3 by 0.001)\na_minus   = 0.010 #<-SLIDE(0.001 to 0.3 by 0.001)\ntau_plus  = 20    #<-SLIDE(5 to 50 by 1)\ntau_minus = 20    #<-SLIDE(5 to 50 by 1)\n\npre_spikes = [\n    \&quot;x  x x  x x          x\&quot;,\n    \&quot;  x x   xxx     x     \&quot;,\n]\npost_spikes = [\n    \&quot; xx    x       x       \&quot;,\n    \&quot; x   x     x           \&quot;,\n]\n\nclass STDPWeights:\n    def __init__(self, numPre, numPost, tau_plus = 0.02, tau_minus = 0.02, a_plus = 0.01, a_minus = 0.011, g_min=0, g_max=1):\n        self.numPre = numPre\n        self.numPost = numPost\n        self.tau_plus = tau_plus\n        self.tau_minus = tau_minus\n        self.a_plus = a_plus\n        self.a_minus = a_minus\n        self.x = np.zeros(numPre)\n        self.y = np.zeros(numPost)\n\n        self.g_min = g_min\n        self.g_max = g_max\n        self.w = np.zeros((numPre, numPost)) # A 2-D array; numPre x numPost zeros (normally would be random)\n\n\n    def step(self, t_step):\n        self.x = self.x * np.exp(-t_step/self.tau_plus)\n        self.y = self.y * np.exp(-t_step/self.tau_minus)\n\n    def updateWeights(self, preOutputs, postOutputs):\n        self.x += (preOutputs  > 0) * self.a_plus\n        self.y -= (postOutputs > 0) * self.a_minus\n\n        alpha_g = self.g_max - self.g_min # Scaling factor for weight updates\n\n        preSpikeIndices = np.where(preOutputs > 0)[0]   # Indices of pre-synaptic   spiking neurons\n        postSpikeIndices = np.where(postOutputs > 0)[0]\n\n        for ps_idx in preSpikeIndices:\n            self.w[ps_idx] += alpha_g * self.y\n            self.w[ps_idx] = np.clip(self.w[ps_idx], self.g_min, self.g_max)\n\n        for ps_idx in postSpikeIndices:\n            self.w[:, ps_idx] += alpha_g * self.x\n            self.w[:, ps_idx] = np.clip(self.w[:, ps_idx], self.g_min, self.g_max)\n\n\nSIM_PER_TIME = 100\n\ndef str2spikes(s, max_length=None, dt_per_char=SIM_PER_TIME, offset=0):\n    if max_length is None: max_length = len(s)\n\n    spikes = []\n    for i in range(max_length):\n        for _ in range(offset):\n            spikes.append(False)\n        spikes.append(i < len(s) and s[i] != ' ')\n        for _ in range(dt_per_char - offset - 1):\n            spikes.append(False)\n\n    return spikes\n\ndef clone(arr):\n    return arr[:]\n\ndef clone2d(arr):\n    return [clone(a) for a in arr]\n\ndef plotDWView(pre_spike_strs, post_spike_strs, show_w=True, options=None, offsets={}, gmin=0, gmax=1, tau_plus=20.0, tau_minus=20.0, a_plus=0.01, a_minus=0.011):\n    if options is None:\n        options = {}\n        \n    max_length_string = max(len(s) for s in pre_spike_strs+post_spike_strs)\n    pre_spikes  = [str2spikes(ps, int(max_length_string * 1.2), offset=offsets.get(('pre', idx), 0)) for idx, ps in enumerate(pre_spike_strs)]\n    post_spikes = [str2spikes(ps, int(max_length_string * 1.2), offset=offsets.get(('post', idx), 0)) for idx, ps in enumerate(post_spike_strs)]\n\n    all_spikes = pre_spikes + post_spikes\n\n    padding = options.get('display', {}).get('padding', 5)\n    label_width = 30\n    padding_left = padding + label_width + padding\n    padding_between_spike_view = 5\n    padding_between_graphs = 20\n    padding_between_weight_view = 5\n\n    per_spike_height = 15\n    per_graph_height = 70\n    per_w_height = 100 if show_w else 0\n    \n    num_pre_neurons  = len(pre_spikes)\n    num_post_neurons = len(post_spikes)\n    \n    spike_display_height = per_spike_height * (num_pre_neurons + num_post_neurons)\n    graph_display_height = per_graph_height * (num_pre_neurons + num_post_neurons)\n    dw_display_height = (per_w_height + padding_between_weight_view) * num_post_neurons\n    \n    height = spike_display_height + graph_display_height + padding_between_spike_view * (num_pre_neurons + num_post_neurons) + dw_display_height + 2 * padding + padding_between_graphs * (num_pre_neurons + num_post_neurons - 1)\n    width = options.get('display', {}).get('width', 1000)\n    \n    fig, ax = plt.subplots(figsize=(width / 100, height / 100))\n    \n    all_spikes = pre_spikes + post_spikes\n    \n    sim_time = max(len(s) for s in all_spikes)\n    \n    # Initialize weights and other variables\n    x = np.zeros((sim_time, num_pre_neurons))\n    y = np.zeros((sim_time, num_post_neurons))\n    w = np.zeros((sim_time, num_pre_neurons, num_post_neurons))\n    \n    dt = 10 / SIM_PER_TIME\n    weights = STDPWeights(num_pre_neurons, num_post_neurons, tau_plus=tau_plus, tau_minus=tau_minus, a_plus=a_plus, a_minus=a_minus, g_min=gmin, g_max=gmax)\n\n    for t in range(sim_time-1):\n        preSpikes  = np.array([s[t] for s in pre_spikes])\n        postSpikes = np.array([s[t] for s in post_spikes])\n\n        weights.step(dt)\n        weights.updateWeights(preSpikes, postSpikes)\n\n        x[t+1] = clone(weights.x)\n        y[t+1] = clone(weights.y)\n        w[t+1] = clone2d(weights.w) if len(weights.w) > 0 else np.zeros((num_pre_neurons, num_post_neurons))\n    \n    \n    spike_scale_x = np.linspace(padding_left, width + padding, sim_time)\n    \n    for i in range(num_pre_neurons + num_post_neurons):\n        is_pre_synaptic = i < num_pre_neurons\n        is_post_synaptic = not is_pre_synaptic\n        spikes = all_spikes[i]\n        neuron_index = i if is_pre_synaptic else i - num_pre_neurons\n        color = plt.get_cmap('tab10')(neuron_index if is_pre_synaptic else 9 - (neuron_index % 10))\n        y_loc = padding + i * (per_spike_height + per_graph_height + padding_between_graphs + padding_between_spike_view) + (is_post_synaptic * (per_w_height + padding_between_weight_view) * neuron_index)\n\n        ax.add_patch(plt.Rectangle((padding, y_loc), label_width, per_spike_height + per_graph_height + padding_between_spike_view + (0 if is_pre_synaptic else (per_w_height + padding_between_weight_view)), edgecolor='#333', facecolor='#EEE' if is_pre_synaptic else '#777'))\n        ax.text(padding + label_width / 2, y_loc + (per_spike_height + per_graph_height + padding_between_spike_view + (0 if is_pre_synaptic else (per_w_height + padding_between_weight_view))) / 2, f\&quot;{'pre' if is_pre_synaptic else 'post'} #{neuron_index + 1}\&quot;, ha='center', va='center', rotation='vertical', fontsize=10, color='#333' if is_pre_synaptic else '#EEE')\n        \n        spike_times = [t for t, spike in enumerate(spikes) if spike]\n\n        \n        for t in spike_times:\n            display_x = spike_scale_x[t]\n            ax.plot([display_x, display_x], [y_loc, y_loc + per_spike_height], color=color, linewidth=5)\n            ax.plot([display_x, display_x], [y_loc, height], color=color, linewidth=1, linestyle=(0, (1, 7)))\n\n        \n        trace_var = x if is_pre_synaptic else y\n        trace_val = trace_var[:, neuron_index]\n        max_trace_val = np.max(np.abs(trace_val))\n        ax.plot(spike_scale_x[:len(trace_val)], -trace_val*(per_graph_height / max_trace_val) + y_loc + per_spike_height + padding_between_spike_view + (per_graph_height if is_pre_synaptic else 0), color=color)\n        \n        if is_post_synaptic and show_w:\n            max_prepost_w = np.max(np.abs(w[:, :, neuron_index]))\n            for pre_neuron_index in range(num_pre_neurons):\n                pre_color = plt.get_cmap('tab10')(pre_neuron_index)\n                prepost_w = w[:, pre_neuron_index, neuron_index]\n                ax.plot(spike_scale_x[:len(prepost_w)], -prepost_w*(per_w_height / max_prepost_w) + y_loc + per_graph_height + per_spike_height + per_w_height + 2*padding_between_spike_view, color=pre_color)\n    \n    plt.gca().invert_yaxis() \n    \n    # remove axis\n    ax.spines['top'].set_visible(False)\n    ax.spines['right'].set_visible(False)\n    ax.spines['left'].set_visible(False)\n    ax.spines['bottom'].set_visible(False)\n\n    # remove ticks\n    ax.tick_params(axis='both', which='both', bottom=False, top=False, labelbottom=False, left=False, right=False, labelleft=False)\n\n    plt.show()\n\nplotDWView(pre_spikes, post_spikes, tau_plus=tau_plus, tau_minus=tau_minus, a_plus=a_plus, a_minus=a_minus, options={'display':{'width': 750}})&quot;"
+                                          id             = "editor-9-hash-6376893567250408777"
+                                          ></div><p>Note that there are many small variants on how STDP is implemented, including only updating on pre- or post-synaptic spikes or having multiple updates for each post-synaptic spike.</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<ul>
+<li><p>In Hebbian learning, we update synaptic weights to ensure that neurons whose firings are correlated and causal build a stronger synapctic connection</p></li>
+<li><p>STDP is an implementation of Hebbian learning with update rules (when a pre-synaptic neuron fires at time <span class="math notranslate nohighlight">\(t_{pre}\)</span> and a post-synaptic neuron fires at time <span class="math notranslate nohighlight">\(t_{post}\)</span>):</p>
+<ul>
+<li><div class="math notranslate nohighlight">
+\[\begin{split} \Delta{}w =
+    \begin{cases}
+      A_+e^{\frac{(t_{pre}-t_{post})}{\tau_+}}, &amp; \text{if } t_{pre} &lt; t_{post} \\
+      -A_{-}e^{\frac{-(t_{pre}-t_{post})}{\tau_{-}}}, &amp; \text{if } t_{pre} \geq t_{post}
+    \end{cases}
+    \end{split}\]</div>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(A_+\)</span> and <span class="math notranslate nohighlight">\(A_-\)</span> specify how much to increment correlated and anti-correlated firing, respectively</p></li>
+<li><p><span class="math notranslate nohighlight">\(\tau_+\)</span> and <span class="math notranslate nohighlight">\(\tau_-\)</span> are time constants that specify how quickly our update rule for <span class="math notranslate nohighlight">\(\Delta{}w\)</span> should go to <span class="math notranslate nohighlight">\(0\)</span></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>The Neuromatch Academy has <a class="reference external" href="https://compneuro.neuromatch.io/tutorials/W2D3_BiologicalNeuronModels/student/W2D3_Tutorial4.html">a helpful overview of STDP</a> that helped guide some of the notation and visualizations in this notebook</p></li>
+<li><p>The Neuronal Dynamics book has <a class="reference external" href="https://neuronaldynamics.epfl.ch/online/Ch19.S2.html">a more detailed overview of Hebbian learning and STDP</a></p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="15%20-%20Adaptive%20LIF%20Neurons.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Adaptive LIF Neurons</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="17%20-%20Research%20Replication%201.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Learning through Spike-Timing Dependent Plasticity (STDP)</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hebbian-learning">Hebbian Learning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spike-timing-dependent-plasticity-stdp">Spike-Timing Dependent Plasticity (STDP)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#update-rules">Update Rules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#implementing-stdp">Implementing STDP</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

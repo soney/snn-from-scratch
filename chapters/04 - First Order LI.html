@@ -1,0 +1,837 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>First-Order Approximations of LI Neurons &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/04 - First Order LI';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Implementing Firing in LIF Neurons" href="05%20-%20Implementing%20Firing.html" />
+    <link rel="prev" title="Basic Neuron Models" href="03%20-%20Basic%20Neuron%20Models.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html">Basic Neuron Models</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="09%20-%20Collections%20of%20Neurons.html">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="12%20-%20Improving%20Accuracy.html">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16%20-%20STDP.html">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="17%20-%20Research%20Replication%201.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/04 - First Order LI.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/04 - First Order LI.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>First-Order Approximations of LI Neurons</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulating-neurons-in-discrete-time">Simulating Neurons in Discrete Time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-implementation">Code Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graphing-outputs">Graphing Outputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulation">Simulation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="first-order-approximations-of-li-neurons">
+<h1>First-Order Approximations of LI Neurons<a class="headerlink" href="#first-order-approximations-of-li-neurons" title="Link to this heading">#</a></h1>
+<p>Until access to neuromorphic hardware becomes more widespread, most neuromorphic algorithms are simulated on “standard” hardware and then ported to neuromorphic hardware. There are plenty of frameworks that can do this. However, it can be instructive to build our own.</p>
+<p>We’re going to start by implementing a simulation of the leaky integrate-and-fire (LIF) neurons described in the previous page. We will implement our code in Python.</p>
+<p>Recall from <a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html"><span class="std std-doc">last time</span></a> that we have the formula <a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html#equation-eq-dvdt">(1)</a> describing the potential of a neuron as:</p>
+<div class="math notranslate nohighlight">
+\[v'(t) = \frac{1}{\tau}I(t) - \frac{1}{\tau}v(t)\]</div>
+<p>Because we are going to introduce other time constants, we will rename <span class="math notranslate nohighlight">\(\tau\)</span> to be <span class="math notranslate nohighlight">\(\tau_{rc}\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-vprime">
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-vprime" title="Link to this equation">#</a></span>\[v'(t) = \frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t)\]</div>
+<section id="simulating-neurons-in-discrete-time">
+<span id="ssec-discrete-time-lif"></span><h2>Simulating Neurons in Discrete Time<a class="headerlink" href="#simulating-neurons-in-discrete-time" title="Link to this heading">#</a></h2>
+<p>So far, we have a definition of how <span class="math notranslate nohighlight">\(v(t)\)</span> changes over time (<span class="math notranslate nohighlight">\(v'(t)\)</span>) but we haven’t actually defined <span class="math notranslate nohighlight">\(v(t)\)</span> itself. We are going to <em>estimate</em> <span class="math notranslate nohighlight">\(v(t)\)</span> using <strong>discrete time</strong>, meaning we’ll split time into small time steps (like 0.001 seconds). We will refer to the amount of time that a step represents as <span class="math notranslate nohighlight">\(T_{step}\)</span>.</p>
+<p>Then, rather than representing a precise time, <span class="math notranslate nohighlight">\(t\)</span> instead represents the step number and is a positive integer (<span class="math notranslate nohighlight">\(t \in \mathbb{N}\)</span>). We will use square brackets to indicate that we are modeling in discrete time: <span class="math notranslate nohighlight">\(v[t]\)</span>.</p>
+<p>If our neuron starts at <span class="math notranslate nohighlight">\(v_{init}\)</span>, then we can calculate our neuron’s potential as:</p>
+<div class="math notranslate nohighlight" id="equation-eq-vdiscrete">
+<span class="eqno">(3)<a class="headerlink" href="#equation-eq-vdiscrete" title="Link to this equation">#</a></span>\[\begin{split}
+\begin{align}
+v[0] &amp;= v_{init} \\
+v[t] &amp;= v[t-1] (1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}I[t]
+\end{align}
+\end{split}\]</div>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">How did we get this value for <span class="math notranslate nohighlight">\(v[t]\)</span>?</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">We started with a definition of how <span class="math notranslate nohighlight">\(v(t)\)</span> changes over time <a class="reference internal" href="#equation-eq-vprime">(2)</a> (<span class="math notranslate nohighlight">\(v'(t)\)</span>) but we did not actually define <span class="math notranslate nohighlight">\(v(t)\)</span>. As a first step of doing this, let’s <em>approximate</em> its value using <a class="reference external" href="https://en.wikipedia.org/wiki/Euler_method">Euler’s method</a>. Euler’s method estimates a function by using its rate of change (in our case, <span class="math notranslate nohighlight">\(v'(t)\)</span>) and starting value.</p>
+<h2 class="rubric" id="euler-s-approximation">Euler’s Approximation</h2>
+<p class="sd-card-text">If we already know <span class="math notranslate nohighlight">\(v(t)\)</span> and the rate of change <span class="math notranslate nohighlight">\(v'(t)\)</span> then for some small time increment <span class="math notranslate nohighlight">\(\Delta{}t\)</span>, we can estimate the value of <span class="math notranslate nohighlight">\(v(t+\Delta{}t)\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) \approx v(t) + v'(t)\Delta{}t\]</div>
+<p class="sd-card-text">in our case, subbing in for <span class="math notranslate nohighlight">\(v'(t)\)</span> <a class="reference internal" href="#equation-eq-vprime">(2)</a> we have:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) \approx v(t) + (\frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t))\Delta{}t\]</div>
+<p class="sd-card-text">which can be re-arranged to:</p>
+<div class="math notranslate nohighlight" id="equation-eq-euler-vt">
+<span class="eqno">(4)<a class="headerlink" href="#equation-eq-euler-vt" title="Link to this equation">#</a></span>\[v(t + \Delta{}t) \approx v(t)(1 - \frac{\Delta{}t}{\tau_{rc}}) + \frac{\Delta{}t}{\tau_{rc}}I(t)\]</div>
+<p class="sd-card-text">Our estimate is usually most accurate if we use small values for <span class="math notranslate nohighlight">\(\Delta{}t\)</span>.</p>
+<h2 class="rubric" id="discrete-time-simulations">Discrete Time Simulations</h2>
+<p class="sd-card-text">Our definitions <span class="math notranslate nohighlight">\(v(t)\)</span> is one of a “continuous” function, meaning that <span class="math notranslate nohighlight">\(t\)</span> could be any arbitrarily precise positive number (in math notation, <span class="math notranslate nohighlight">\(t \in \mathbb{R}, t \ge 0\)</span>). However, when we simulate SNNs, we typically instead use “discrete” simulations, meaning that we split time into small time steps (like 0.001 seconds). We will refer to the amount of time that a step represents as <span class="math notranslate nohighlight">\(T_{step}\)</span> Then, rather than representing a precise time, <span class="math notranslate nohighlight">\(t\)</span> instead represents the step number and is a positive integer (<span class="math notranslate nohighlight">\(t \in \mathbb{N}\)</span>). We will use square brackets to indicate that we are modeling in discrete time: <span class="math notranslate nohighlight">\(v[t]\)</span>.</p>
+<p class="sd-card-text">Our definition of <span class="math notranslate nohighlight">\(v[t]\)</span> is an approximation of <span class="math notranslate nohighlight">\(v(t)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[v[t] :\approx v(\frac{1}{T_{step}}t)\]</div>
+<p class="sd-card-text">Similarly, we will estimate our incoming potential (<span class="math notranslate nohighlight">\(I(t)\)</span>) in discrete time steps as <span class="math notranslate nohighlight">\(I[t]\)</span>.</p>
+<p class="sd-card-text">Now, suppose we choose a value of <span class="math notranslate nohighlight">\(T_{step}\)</span> that is small enough for our approximation using Euler’s method to be accurate. Then, we could take our formula from above <a class="reference internal" href="#equation-eq-euler-vt">(4)</a> and use <span class="math notranslate nohighlight">\(T_{step}\)</span> as <span class="math notranslate nohighlight">\(\Delta{}t\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[v(t + T_{step}) \approx v(t)(1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}I(t)\]</div>
+<p class="sd-card-text">In discrete time, this means</p>
+<div class="math notranslate nohighlight">
+\[
+v[t+1] = v[t](1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}I[t]
+\]</div>
+<p class="sd-card-text">Now, we have a definition of <span class="math notranslate nohighlight">\(v[t+1]\)</span> in terms of <span class="math notranslate nohighlight">\(v[t]\)</span> but we need a place for <span class="math notranslate nohighlight">\(v\)</span> to start at: <span class="math notranslate nohighlight">\(v[0]\)</span>. We can make this a parameter of our neuron, which we will call <span class="math notranslate nohighlight">\(v_{init}\)</span>:</p>
+<ul class="simple">
+<li><p class="sd-card-text"><span class="math notranslate nohighlight">\(v[0] = v_{init}\)</span></p></li>
+<li><p class="sd-card-text"><span class="math notranslate nohighlight">\(v[t] = v[t-1] (1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}I[t]\)</span></p></li>
+</ul>
+<p class="sd-card-text">Note that in the second equation, we assumed that potential energy gets added <strong>immediately</strong> and thus replaced <span class="math notranslate nohighlight">\(I[t-1]\)</span> with <span class="math notranslate nohighlight">\(I[t]\)</span>, which will help simplify our code while still remaining reasonably accurate.</p>
+</div>
+</details><p>So far, our neurons have a few constants that determine its dynamics:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(T_{step}\)</span>, the size of time steps that we use</p></li>
+<li><p><span class="math notranslate nohighlight">\(\tau_{rc}\)</span>, which specifies how quickly our potential decays (larger <span class="math notranslate nohighlight">\(\tau_{rc}\)</span> means slower potential decay)</p></li>
+<li><p><span class="math notranslate nohighlight">\(v_{init}\)</span>, how much potential our neuron <em>starts</em> with</p></li>
+<li><p><span class="math notranslate nohighlight">\(v_{th}\)</span>, the threshold potential above which our neuron will fire.</p></li>
+</ul>
+</section>
+<section id="code-implementation">
+<h2>Code Implementation<a class="headerlink" href="#code-implementation" title="Link to this heading">#</a></h2>
+<p>Let’s start to implement our neurons in code. We are going to define a Python <em>class</em> to represent our neuron.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">What is a Python “class”?</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<p class="sd-card-text">In Python, a <em>class</em> is a blueprint for creating objects. An object is an instance of a class. For example, if we have a class <code class="docutils literal notranslate"><span class="pre">Dog</span></code>, then an object of the class <code class="docutils literal notranslate"><span class="pre">Dog</span></code> is a specific dog, like <code class="docutils literal notranslate"><span class="pre">Fido</span></code> or <code class="docutils literal notranslate"><span class="pre">Rex</span></code>. The class defines the properties (like <code class="docutils literal notranslate"><span class="pre">name</span></code> or <code class="docutils literal notranslate"><span class="pre">breed</span></code>) and methods (like <code class="docutils literal notranslate"><span class="pre">bark()</span></code> or <code class="docutils literal notranslate"><span class="pre">fetch()</span></code>) that all dogs have. When we create an object of the class <code class="docutils literal notranslate"><span class="pre">Dog</span></code>, we can set the properties to specific values (like <code class="docutils literal notranslate"><span class="pre">Fido</span></code> is a “Golden Retriever”) and call the methods (like <code class="docutils literal notranslate"><span class="pre">Fido.bark()</span></code>).</p>
+<p class="sd-card-text">In our case, we will define a class to represent neurons. We can then create individual neurons as “instances” of this class.</p>
+</div>
+</details><p>It will have a <code class="docutils literal notranslate"><span class="pre">step()</span></code> function to “advance” by one time step. We will call our class <code class="docutils literal notranslate"><span class="pre">FirstOrderLI</span></code> (leaving out the “F” in “LIF” because our neuron does not fire yet). Our class will have two arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tau_rc</span></code> to represent <span class="math notranslate nohighlight">\(\tau_{rc}\)</span> We will also use the instance variable <code class="docutils literal notranslate"><span class="pre">self.tau_rc</span></code> to track this. Default value:<code class="docutils literal notranslate"><span class="pre">0.2</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">v_init</span></code> to represent <span class="math notranslate nohighlight">\(v_{init}\)</span>. Default value: <code class="docutils literal notranslate"><span class="pre">0</span></code></p></li>
+</ul>
+<p>Further, it contains an instance variable <code class="docutils literal notranslate"><span class="pre">self.v</span></code> to represent the <em>latest</em> value of <span class="math notranslate nohighlight">\(v[t]\)</span>. The <code class="docutils literal notranslate"><span class="pre">step()</span></code> function advances to the next value of <code class="docutils literal notranslate"><span class="pre">t</span></code> and accepts two parameters: <code class="docutils literal notranslate"><span class="pre">I</span></code> to represent <span class="math notranslate nohighlight">\(I[t]\)</span> and <code class="docutils literal notranslate"><span class="pre">t_step</span></code> to represent <span class="math notranslate nohighlight">\(T_{step}\)</span>. Every time we call the <code class="docutils literal notranslate"><span class="pre">step()</span></code> method, our LIF moves forward by one time step and updates <code class="docutils literal notranslate"><span class="pre">self.v</span></code> accordingly.</p>
+<p>So if we have never called <code class="docutils literal notranslate"><span class="pre">step()</span></code>, <code class="docutils literal notranslate"><span class="pre">self.v</span></code> represents <span class="math notranslate nohighlight">\(v[0]\)</span>. If we have called <code class="docutils literal notranslate"><span class="pre">step()</span></code> <span class="math notranslate nohighlight">\(1\)</span> time, <code class="docutils literal notranslate"><span class="pre">self.v</span></code> represents <span class="math notranslate nohighlight">\(v[1]\)</span>. So in order to compute <span class="math notranslate nohighlight">\(v[T]\)</span>, we need to call <code class="docutils literal notranslate"><span class="pre">step()</span></code> <span class="math notranslate nohighlight">\(T\)</span> times.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FirstOrderLI</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">=</span> <span class="n">tau_rc</span> <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>      <span class="o">=</span> <span class="n">v_init</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In Python, we create an “instance” of this class with <code class="docutils literal notranslate"><span class="pre">FirstOrderLI()</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">neuron1</span> <span class="o">=</span> <span class="n">FirstOrderLI</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can also pass in custom values for <code class="docutils literal notranslate"><span class="pre">tau_rc</span></code> and <code class="docutils literal notranslate"><span class="pre">v_init</span></code> to override the defaults:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">neuron2</span> <span class="o">=</span> <span class="n">FirstOrderLI</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step 0: </span><span class="si">{</span><span class="n">neuron2</span><span class="o">.</span><span class="n">v</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">neuron2</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span> <span class="c1"># Apply a current of 0.5 for 1 ms</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step 1: </span><span class="si">{</span><span class="n">neuron2</span><span class="o">.</span><span class="n">v</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">neuron2</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>   <span class="c1"># Apply no current for 1 ms</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step 2: </span><span class="si">{</span><span class="n">neuron2</span><span class="o">.</span><span class="n">v</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">neuron2</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">)</span>   <span class="c1"># Apply no current for 1 ms</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step 3: </span><span class="si">{</span><span class="n">neuron2</span><span class="o">.</span><span class="n">v</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Step 0: neuron2.v=0.1
+Step 1: neuron2.v=0.3
+Step 2: neuron2.v=0.15
+Step 3: neuron2.v=0.075
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="graphing-outputs">
+<h2>Graphing Outputs<a class="headerlink" href="#graphing-outputs" title="Link to this heading">#</a></h2>
+<p>Let’s simulate a neuron for some period of time. First, we create a neuron:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">neuron</span> <span class="o">=</span> <span class="n">FirstOrderLI</span><span class="p">(</span><span class="n">v_init</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">)</span> <span class="c1"># Create a new instance with v_init = 0.6</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then, we’ll simulate the neuron over the course of two seconds, with <span class="math notranslate nohighlight">\(T_{step}=0.001\)</span> seconds, and no input current. We’ll track the value of <code class="docutils literal notranslate"><span class="pre">neuron.v</span></code> in the list <code class="docutils literal notranslate"><span class="pre">v_history</span></code>.</p>
+<p><em>Note: we’re also going to use <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.arange.html">the <code class="docutils literal notranslate"><span class="pre">numpy</span></code> library’s <code class="docutils literal notranslate"><span class="pre">arange</span></code> function</a> to create a list of time steps from <code class="docutils literal notranslate"><span class="pre">0</span></code> to <code class="docutils literal notranslate"><span class="pre">2</span></code> seconds.</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">T_step</span>   <span class="o">=</span> <span class="mf">0.001</span> <span class="c1"># Time step size</span>
+<span class="n">duration</span> <span class="o">=</span> <span class="mf">2.0</span>   <span class="c1"># Duration of the simulation: 2 seconds</span>
+<span class="n">I</span>        <span class="o">=</span> <span class="mi">0</span>     <span class="c1"># No input current</span>
+
+<span class="n">v_history</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span> <span class="c1"># Create a range of time values</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span> <span class="c1"># Loop over time</span>
+    <span class="n">v_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="c1"># Record the neuron&#39;s potential</span>
+    <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span> <span class="c1"># Advance one time step</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">v_history</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span> <span class="n">v_history</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:])</span> <span class="c1"># Print the first and last 5 potentials</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0.6, 0.597, 0.594015, 0.5910449249999999, 0.588089700375] ... [2.7239387514018173e-05, 2.7103190576448083e-05, 2.6967674623565844e-05, 2.6832836250448015e-05, 2.6698672069195774e-05]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then, we’ll graph the value of <code class="docutils literal notranslate"><span class="pre">v_history</span></code> using <a class="reference external" href="https://matplotlib.org/">Matplotlib</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span> <span class="c1"># Create a new figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">v_history</span><span class="p">)</span> <span class="c1"># Plot the neuron&#39;s potential over time</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span> <span class="c1"># Label the x-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Neuron potential&#39;</span><span class="p">)</span> <span class="c1"># Label the y-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Display the plot</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/416e80ac257e8e1ac6179160955889c1d00ad590d78d1625eb885c9bf9780a02.png" src="../_images/416e80ac257e8e1ac6179160955889c1d00ad590d78d1625eb885c9bf9780a02.png" />
+</div>
+</div>
+<p>we can see that our neuron’s potential (<code class="docutils literal notranslate"><span class="pre">neuron.v</span></code>) decays exponentially over time. Now, let’s see what happens if we instead use a “square wave” input current. We’ll define a <code class="docutils literal notranslate"><span class="pre">square_wave</span></code> function for this.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">square_wave_func</span><span class="p">(</span><span class="n">off_time_interval</span><span class="p">,</span> <span class="n">on_time_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> <span class="c1"># Define a function that returns a square wave</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    off_time_interval: time interval for which the square wave is 0</span>
+<span class="sd">    on_time_interval: time interval for which the square wave is 1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">on_time_interval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># If on_time_interval is not provided, set it equal to off_time_interval</span>
+        <span class="n">on_time_interval</span> <span class="o">=</span> <span class="n">off_time_interval</span>
+    
+    <span class="k">return</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="n">t</span> <span class="o">%</span> <span class="p">(</span><span class="n">off_time_interval</span> <span class="o">+</span> <span class="n">on_time_interval</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">off_time_interval</span> <span class="k">else</span> <span class="mi">0</span> <span class="c1"># Return a lambda function representing the square wave</span>
+
+<span class="n">square_wave</span> <span class="o">=</span> <span class="n">square_wave_func</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Create a square wave function with a period of 2 seconds</span>
+
+<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span> <span class="c1"># Create a range of time values</span>
+<span class="n">square_wave_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">square_wave</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">]</span> <span class="c1"># Compute the square wave values</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span> <span class="c1"># Create a new figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">square_wave_values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span> <span class="c1"># Plot the square wave</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span> <span class="c1"># Label the x-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Amplitude&#39;</span><span class="p">)</span> <span class="c1"># Label the y-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Display the plot</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/26d989029aea3bd22895d6e575f54d57e0f5f243495b3912dc56e45f1d323519.png" src="../_images/26d989029aea3bd22895d6e575f54d57e0f5f243495b3912dc56e45f1d323519.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">duration</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1"># Duration of the simulation: 6 seconds</span>
+
+<span class="n">neuron</span> <span class="o">=</span> <span class="n">FirstOrderLI</span><span class="p">()</span> <span class="c1"># Create a new instance with default parameters</span>
+
+<span class="n">v_history</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">I_history</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span> <span class="c1"># Create a range of time values</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span> <span class="c1"># Loop over time</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="n">square_wave</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="c1"># Get the input current at time t</span>
+    <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span> <span class="c1"># Advance one time step</span>
+
+    <span class="n">v_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="c1"># Record the neuron&#39;s potential</span>
+    <span class="n">I_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>        <span class="c1"># Record the input current</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span> <span class="c1"># Create a new figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">v_history</span><span class="p">)</span> <span class="c1"># Plot the neuron&#39;s potential over time</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">I_history</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span> <span class="c1"># Plot the input current over time</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span> <span class="c1"># Label the x-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Neuron potential / Input current&#39;</span><span class="p">)</span> <span class="c1"># Label the y-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Neuron potential&#39;</span><span class="p">,</span> <span class="s1">&#39;Input current&#39;</span><span class="p">])</span> <span class="c1"># Add a legend</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Display the plot</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/52eb2d0653abe319e4d71304e73c2dd8868030ca17cb8cb9aea977aea0a5b40e.png" src="../_images/52eb2d0653abe319e4d71304e73c2dd8868030ca17cb8cb9aea977aea0a5b40e.png" />
+</div>
+</div>
+</section>
+<section id="simulation">
+<h2>Simulation<a class="headerlink" href="#simulation" title="Link to this heading">#</a></h2>
+<p>Look at the code below and try different values for <code class="docutils literal notranslate"><span class="pre">tau_rc</span></code>, <code class="docutils literal notranslate"><span class="pre">T_step</span></code>, and <code class="docutils literal notranslate"><span class="pre">input_func</span></code>. Note how our simulation becomes inaccurate for large values of <code class="docutils literal notranslate"><span class="pre">T_step</span></code>. For example, <em>modify the code</em> so that:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tau_rc</span> <span class="pre">=</span> <span class="pre">0.100</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T_step</span> <span class="pre">=</span> <span class="pre">0.200</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_func</span> <span class="pre">=</span> <span class="pre">&quot;no-input&quot;</span></code></p></li>
+</ul>
+<p>With this combination of parameters, we can overshoot <code class="docutils literal notranslate"><span class="pre">0</span></code> and oscillate instead of decaying. This shows that it’s important to make <span class="math notranslate nohighlight">\(T_{step}\)</span> small enough for accurate simulations.</p>
+<div class="custom---editor"
+                                          data-arguments = "[&quot;python&quot;]"
+                                          data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;500px&quot;}"
+                                          data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\n\n# Simulation parameters\nv_init =   0.6   # Initial voltage for neuron\ntau_rc =   0.500 # Time constant for neuron <-SLIDE(0.008 to 0.5 by 0.001)\nT_step =   0.010 # Time step size <-SLIDE(0.001 to 0.2 by 0.001)\ninput_func = \&quot;square-wave\&quot;  # Input function <-SELECT(\&quot;no-input\&quot;, \&quot;square-wave\&quot;)\n\nduration = 4     # Total time for simulation\n\ndef no_input(t): return 0 # No input function\ndef square_wave_input(t): return 1 if (t % 2) < 1 else 0 # Square wave function\n\nI_func = square_wave_input if input_func == \&quot;square-wave\&quot; else no_input\n\nclass FirstOrderLI: # First Order Leaky Integrate\n    def __init__(self, tau_rc=0.2, v_init=0): # Default values for tau_rc and v_init\n        self.tau_rc = tau_rc # Set instance variables\n        self.v = v_init\n\n    def step(self, I, t_step): # Advance one time step (input I and time step size t_step)\n        self.v = self.v * (1 - t_step / self.tau_rc) + I * t_step / self.tau_rc\n\nneuron = FirstOrderLI(tau_rc = tau_rc, v_init = v_init) # create an instance of FirstOrderLI\n\n# Time vector\ntimes = np.arange(0, duration, T_step)\nv_history = []\nI_history = []\n\n# Run the simulation\nfor t in times:\n    I = I_func(t)\n    neuron.step(I_func(t), T_step)\n    I_history.append(I)\n    v_history.append(neuron.v)\n\nplt.figure() # Create a new figure\nplt.plot(times, v_history) # Plot the neuron's potential over time\nplt.plot(times, I_history, color=\&quot;grey\&quot;, linestyle=\&quot;--\&quot;) # Plot the input current over time\nplt.xlabel('Time (s)') # Label the x-axis\nplt.ylabel('Neuron potential / Input current') # Label the y-axis\nplt.legend(['Neuron potential', 'Input current']) # Add a legend\nplt.show() # Display the plot&quot;"
+                                          id             = "editor-4-hash-6206257695150334152"
+                                          ></div><p>In the next section, we’ll introduce <strong>firing</strong>, to make our neurons proper LI<strong>F</strong> neurons.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="03%20-%20Basic%20Neuron%20Models.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Basic Neuron Models</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="05%20-%20Implementing%20Firing.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Implementing Firing in LIF Neurons</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulating-neurons-in-discrete-time">Simulating Neurons in Discrete Time</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#code-implementation">Code Implementation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graphing-outputs">Graphing Outputs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulation">Simulation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

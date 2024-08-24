@@ -1,0 +1,1194 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1) &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/17 - Research Replication 1';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)" href="18%20-%20Research%20Replication%202.html" />
+    <link rel="prev" title="Learning through Spike-Timing Dependent Plasticity (STDP)" href="16%20-%20STDP.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html">Basic Neuron Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04%20-%20First%20Order%20LI.html">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="09%20-%20Collections%20of%20Neurons.html">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="12%20-%20Improving%20Accuracy.html">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16%20-%20STDP.html">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/17 - Research Replication 1.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/17 - Research Replication 1.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mnist-dataset">MNIST Dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="research-replication-unsupervised-learning-of-digit-recognition-using-stdp-part-1">
+<h1>Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)<a class="headerlink" href="#research-replication-unsupervised-learning-of-digit-recognition-using-stdp-part-1" title="Link to this heading">#</a></h1>
+<p>Let’s apply what we have learned throughout these notebooks to an actual problem. We are going to focus on using the constructs we have built (adaptive LIF neurons, STDP, generating Poisson spike trains, etc.) to replicate the results of <a class="reference external" href="https://www.frontiersin.org/articles/10.3389/fncom.2015.00099/full">a research paper from 2015</a><span id="id1">[<a class="reference internal" href="18%20-%20Research%20Replication%202.html#id7" title="Peter U Diehl and Matthew Cook. Unsupervised learning of digit recognition using spike-timing-dependent plasticity. Frontiers in computational neuroscience, 9:99, 2015.">DC15</a>]</span>. The goal of this paper is to classify handwritten digits using only SNN primitives. Specifically, we will use the (pervasive) <a class="reference external" href="https://en.wikipedia.org/wiki/MNIST_database">MNIST database</a> of handwritten digits to train and test our network. We will use STDP as the learning algorithm for our network to learn from examples.</p>
+<section id="mnist-dataset">
+<h2>MNIST Dataset<a class="headerlink" href="#mnist-dataset" title="Link to this heading">#</a></h2>
+<p>Let’s start by loading the dataset. There are two .zip files attached to this notebook (<a class="reference download internal" download="" href="../_downloads/56c73d58c930abe27446be40fe9e94cb/train-14x14-chunked.zip"><span class="xref download myst">train</span></a> and <a class="reference download internal" download="" href="../_downloads/ae6d81da78c5565e8e4284243a6ab11d/test-14x14-chunked.zip"><span class="xref download myst">test</span></a>). I wrote some code to load the data from these files.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">myst_nb</span> <span class="kn">import</span> <span class="n">glue</span>
+
+<span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">dataGenerator</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">train_zip</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">train_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;index.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">index_file</span><span class="p">:</span>
+            <span class="n">idx_info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">index_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">idx_info</span><span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">]</span>
+            <span class="n">N</span> <span class="o">=</span> <span class="n">idx_info</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            
+            <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">train_zip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                    <span class="n">images</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;images&#39;</span><span class="p">]</span>
+                    <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">img</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+                        <span class="k">yield</span> <span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+                        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="n">N</span><span class="p">:</span> <span class="k">break</span>          
+
+<span class="n">DIGIT_WIDTH</span>  <span class="o">=</span> <span class="mi">14</span>
+<span class="n">DIGIT_HEIGHT</span> <span class="o">=</span> <span class="mi">14</span>
+<span class="n">DIGIT_SIZE</span>   <span class="o">=</span> <span class="n">DIGIT_WIDTH</span> <span class="o">*</span> <span class="n">DIGIT_HEIGHT</span>
+<span class="n">glue</span><span class="p">(</span><span class="s2">&quot;DIGIT_SIZE&quot;</span><span class="p">,</span> <span class="n">DIGIT_SIZE</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">glue</span><span class="p">(</span><span class="s2">&quot;DIGIT_WIDTH&quot;</span><span class="p">,</span> <span class="n">DIGIT_WIDTH</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">glue</span><span class="p">(</span><span class="s2">&quot;DIGIT_HEIGHT&quot;</span><span class="p">,</span> <span class="n">DIGIT_HEIGHT</span><span class="p">,</span> <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># trainDataGenerator = dataGenerator(&#39;../_static/datasets/train-chunked.zip&#39;)</span>
+<span class="n">trainDataGenerator</span> <span class="o">=</span> <span class="n">dataGenerator</span><span class="p">(</span><span class="s1">&#39;../_static/datasets/train-14x14-chunked.zip&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p>Each image is an array of <span class="output text_plain">196</span>(<span class="output text_plain">14</span> x <span class="output text_plain">14</span>) numbers. Each number represents a pixel intensity between 0 (blank) and 255 (filled). Most values will be 0 (blank). Let’s load an image at some random index.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">randomImage</span><span class="p">,</span> <span class="n">randomLabel</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">trainDataGenerator</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">randomImage</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 57, 125, 209, 214, 175, 66, 19, 0, 0, 0, 23, 1, 0, 51, 220, 250, 245, 228, 249, 239, 108, 0, 0, 0, 20, 1, 0, 12, 98, 138, 160, 217, 245, 189, 33, 0, 0, 0, 0, 0, 0, 4, 62, 187, 247, 227, 134, 37, 0, 0, 0, 0, 0, 0, 0, 27, 222, 253, 212, 38, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 42, 78, 216, 209, 53, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 163, 189, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 113, 208, 28, 0, 0, 0, 0, 0, 39, 174, 84, 37, 106, 146, 229, 155, 11, 0, 0, 0, 0, 0, 62, 230, 220, 219, 246, 223, 152, 32, 0, 0, 0, 0, 0, 0, 3, 114, 211, 153, 86, 32, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+</pre></div>
+</div>
+</div>
+</div>
+<p>It’s a little difficult to interpret this so let’s chunk it into a (<span class="output text_plain">14</span> x <span class="output text_plain">14</span>) 2D array and visualize the intensities:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">digitPixels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">randomImage</span><span class="p">),</span> <span class="p">(</span><span class="n">DIGIT_WIDTH</span><span class="p">,</span> <span class="n">DIGIT_HEIGHT</span><span class="p">))</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">digitPixels</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray_r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;on&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">digitPixels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">digitPixels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">digitPixels</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
+<span class="c1"># Setting the ticks to show every number on both axes</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">DIGIT_WIDTH</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">DIGIT_HEIGHT</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Label:&#39;</span><span class="p">,</span> <span class="n">randomLabel</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/b40654cc5c5eacbc285958367145fcfa8e8ac44668227ea0b6a915ceb32203ca.png" src="../_images/b40654cc5c5eacbc285958367145fcfa8e8ac44668227ea0b6a915ceb32203ca.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Label: 3
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’re going to train an SNN that can recognize these digits (given pixel intensities, try to find the correct label). First, we need to convert these pixel intensities into spike trains. We will use <a class="reference internal" href="11%20-%20Representing%202D%20Images.html"><span class="std std-doc">the same method of Poisson spike train generation that we wrote in the previous notebook</span></a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">poisson_fire</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">min_rate</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+    <span class="n">relativeValues</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span> <span class="o">-</span> <span class="n">min_value</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_value</span> <span class="o">-</span> <span class="n">min_value</span><span class="p">)</span>
+    <span class="n">relativeRates</span> <span class="o">=</span> <span class="n">min_rate</span> <span class="o">+</span> <span class="n">relativeValues</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_rate</span> <span class="o">-</span> <span class="n">min_rate</span><span class="p">)</span>
+    <span class="n">probsOfFire</span> <span class="o">=</span> <span class="n">relativeRates</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="n">firings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">probsOfFire</span>
+    <span class="k">return</span> <span class="n">firings</span> <span class="o">/</span> <span class="n">dt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This will fire a spike at a rate proportional to the pixel intensity. We will use this spike train as the input to our network.</p>
+<div class="custom---image-spikes"
+                                          data-arguments = "[]"
+                                          data-options   = "{&quot;width&quot;: &quot;14&quot;, &quot;height&quot;: &quot;14&quot;}"
+                                          data-content   = "&quot;0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 57, 125, 209, 214, 175, 66, 19, 0, 0, 0, 23, 1, 0, 51, 220, 250, 245, 228, 249, 239, 108, 0, 0, 0, 20, 1, 0, 12, 98, 138, 160, 217, 245, 189, 33, 0, 0, 0, 0, 0, 0, 4, 62, 187, 247, 227, 134, 37, 0, 0, 0, 0, 0, 0, 0, 27, 222, 253, 212, 38, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 42, 78, 216, 209, 53, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 163, 189, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 113, 208, 28, 0, 0, 0, 0, 0, 39, 174, 84, 37, 106, 146, 229, 155, 11, 0, 0, 0, 0, 0, 62, 230, 220, 219, 246, 223, 152, 32, 0, 0, 0, 0, 0, 0, 3, 114, 211, 153, 86, 32, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0&quot;"
+                                          id             = "image-spikes-2-hash7333708052170305820"
+                                          ></div><p>We will use a decaying post-synaptic potential function, as implemented in <a class="reference internal" href="13%20-%20Neuron%20Collections.html"><span class="std std-doc">a previous notebook</span></a> connected to the input.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">SynapseCollection</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span> <span class="o">/</span> <span class="n">tau_s</span><span class="p">)</span>  <span class="c1"># Decay factor for synaptic current</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span>  <span class="c1"># Scale factor for input current</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Initial voltage of neurons</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">*</span> <span class="n">inputs</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t_step</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">synapses</span> <span class="o">=</span> <span class="n">SynapseCollection</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">randomImage</span><span class="p">),</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">step1</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+    <span class="n">input_spikes</span> <span class="o">=</span> <span class="n">poisson_fire</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inp</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">min_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">input_spikes</span><span class="p">,</span> <span class="n">synapses</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">input_spikes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">voltages_over_time</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">T</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># second</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+    <span class="n">spikes</span><span class="p">,</span> <span class="n">psp_voltages</span> <span class="o">=</span> <span class="n">step1</span><span class="p">(</span><span class="n">randomImage</span><span class="p">)</span>
+    <span class="n">voltages_over_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psp_voltages</span><span class="p">)</span>
+
+<span class="n">average_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">voltages_over_time</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="c1"># plt.bar(average_values)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">average_values</span><span class="p">)),</span> <span class="n">average_values</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Neuron index&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Average voltage&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/d4738e39fce12abd5e49d5781ad6f78f33d31eff9e035ab6de253a4f697b25b8.png" src="../_images/d4738e39fce12abd5e49d5781ad6f78f33d31eff9e035ab6de253a4f697b25b8.png" />
+</div>
+</div>
+<p>If we lay this out in a grid, we can visualize the spike train as a series of spikes at different intensities. It’s going to look like our input image.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># plot in a 14x14 grid</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">average_values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;hot&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/dd8fcfbe5c703da0b2d15728f4ab79f42055c6e847884967681be8518d0c1304.png" src="../_images/dd8fcfbe5c703da0b2d15728f4ab79f42055c6e847884967681be8518d0c1304.png" />
+</div>
+</div>
+<p>The input to our network is going to be a random digit (like the one above) from the training set “displayed” to the network for some time (0.35 seconds), followed by a blank image for some time (0.15 seconds), and then repeating with the next image for every image in our training set.</p>
+<!-- We defined [a `DigitInput` class](https://observablehq.com/d/01f7c541e3f547f2?collection=@soney/neuromorphic-computing#DigitInput) to represent the digit input (you do not need to read the code). It follows from our previous code on representing numbers but has some more logic for changing the digits over time. -->
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">TIME_TO_SHOW_IMAGES</span> <span class="o">=</span> <span class="mf">0.35</span> <span class="c1"># seconds</span>
+<span class="n">TIME_TO_SHOW_BLANK</span>  <span class="o">=</span> <span class="mf">0.15</span> <span class="c1"># seconds</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_IMAGES</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_IMAGES</span><span class="p">):</span>
+    <span class="n">current_image</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">trainDataGenerator</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">TIME_TO_SHOW_IMAGES</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="n">step1</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">current_image</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">TIME_TO_SHOW_BLANK</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="n">step1</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">current_image</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’ll then connect this input to a layer of <a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html"><span class="std std-doc">Adaptive LIF neurons</span></a> (which we’ll call <code class="docutils literal notranslate"><span class="pre">excitatory_neurons</span></code>). We will use <a class="reference internal" href="16%20-%20STDP.html"><span class="std std-doc">STDP</span></a> to determine the weights between the input and the neurons.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">STDPWeights</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">,</span> <span class="n">tau_plus</span> <span class="o">=</span> <span class="mf">0.03</span><span class="p">,</span> <span class="n">tau_minus</span> <span class="o">=</span> <span class="mf">0.03</span><span class="p">,</span> <span class="n">a_plus</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">a_minus</span> <span class="o">=</span> <span class="mf">0.11</span><span class="p">,</span> <span class="n">g_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">g_max</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPre</span> <span class="o">=</span> <span class="n">numPre</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numPost</span> <span class="o">=</span> <span class="n">numPost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span> <span class="o">=</span> <span class="n">tau_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span> <span class="o">=</span> <span class="n">tau_minus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_plus</span> <span class="o">=</span> <span class="n">a_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a_minus</span> <span class="o">=</span> <span class="n">a_minus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPre</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numPost</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="o">=</span> <span class="n">g_min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">=</span> <span class="n">g_max</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">g_min</span><span class="p">,</span> <span class="n">g_max</span><span class="p">,</span> <span class="p">(</span><span class="n">numPre</span><span class="p">,</span> <span class="n">numPost</span><span class="p">))</span> <span class="o">/</span> <span class="n">numPost</span> <span class="c1"># Initialize weights</span>
+
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_plus</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_minus</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">updateWeights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preOutputs</span><span class="p">,</span> <span class="n">postOutputs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">+=</span> <span class="p">(</span><span class="n">preOutputs</span>  <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_plus</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-=</span> <span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">a_minus</span>
+
+        <span class="n">alpha_g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span> <span class="c1"># Scaling factor for weight updates</span>
+
+        <span class="n">preSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">preOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>   <span class="c1"># Indices of pre-synaptic   spiking neurons</span>
+        <span class="n">postSpikeIndices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">postOutputs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">preSpikeIndices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[</span><span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ps_idx</span> <span class="ow">in</span> <span class="n">postSpikeIndices</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">alpha_g</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">ps_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">g_max</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">LIF</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                 <span class="n">max_rates</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span> <span class="n">intercept_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">v_init</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="c1"># Set neuron parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>  <span class="c1"># Dimensionality of the input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Membrane time constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>  <span class="c1"># Refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_th</span>  <span class="c1"># Threshold voltage for spiking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span> <span class="o">=</span> <span class="n">t_step</span>  <span class="c1"># Time step for simulation</span>
+        
+        <span class="c1"># Initialize state variables</span>
+        <span class="c1"># self.voltage = np.ones(n) * v_init  # Initial voltage of neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>  <span class="c1"># Initial voltage of neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Time remaining in refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Output spikes</span>
+
+        <span class="c1"># Generate random max rates and intercepts within the given range</span>
+        <span class="n">max_rates_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">max_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_rates</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">intercepts_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">intercept_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intercept_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># Calculate gain and bias for each neuron</span>
+        <span class="c1"># self.gain = self.v_th * (1 - 1 / (1 - np.exp((self.tau_ref - 1/max_rates_tensor) / self.tau_rc))) / (intercepts_tensor - 1)</span>
+        <span class="c1"># self.bias = np.expand_dims(self.v_th - self.gain * intercepts_tensor, axis=1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize random encoders</span>
+        <span class="c1"># self.encoders = np.random.randn(n, self.dim)</span>
+        <span class="c1"># self.encoders /= np.linalg.norm(self.encoders, axis=1)[:, np.newaxis]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Reset the state variables to initial conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span>  <span class="c1"># Time step</span>
+
+        <span class="c1"># Update refractory time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">dt</span>
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="c1"># ensure between 0 and dt</span>
+
+        <span class="c1"># Calculate input current</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">+</span> <span class="n">inputs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+
+        <span class="c1"># Update membrane potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span>
+
+        <span class="c1"># Determine which neurons spike</span>
+        <span class="n">spike_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spike_mask</span> <span class="o">/</span> <span class="n">dt</span>  <span class="c1"># Record spikes in output</span>
+
+        <span class="c1"># Calculate the time of the spike</span>
+        <span class="n">t_spike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]))</span> <span class="o">+</span> <span class="n">dt</span>
+
+        <span class="c1"># Reset voltage of spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Set refractory time for spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">t_spike</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>  <span class="c1"># Return the output spikes</span>
+
+<span class="k">class</span> <span class="nc">ALIF</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                 <span class="n">max_rates</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span> <span class="n">intercept_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">v_init</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">tau_inh</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">inc_inh</span><span class="o">=</span><span class="mf">1.0</span> <span class="c1"># &lt;--- ADDED</span>
+                 <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="c1"># Set neuron parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>  <span class="c1"># Dimensionality of the input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Membrane time constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>  <span class="c1"># Refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_th</span>  <span class="c1"># Threshold voltage for spiking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span> <span class="o">=</span> <span class="n">t_step</span>  <span class="c1"># Time step for simulation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># &lt;--- ADDED</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_inh</span> <span class="o">=</span> <span class="n">tau_inh</span>  <span class="c1"># &lt;--- ADDED</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inc_inh</span> <span class="o">=</span> <span class="n">inc_inh</span>  <span class="c1"># &lt;--- ADDED</span>
+        
+        <span class="c1"># Initialize state variables</span>
+        <span class="c1"># self.voltage = np.ones(n) * v_init  # Initial voltage of neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>  <span class="c1"># Initial voltage of neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Time remaining in refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Output spikes</span>
+
+        <span class="c1"># Generate random max rates and intercepts within the given range</span>
+        <span class="n">max_rates_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">max_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_rates</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">intercepts_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">intercept_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intercept_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># Calculate gain and bias for each neuron</span>
+        <span class="c1"># self.gain = self.v_th * (1 - 1 / (1 - np.exp((self.tau_ref - 1/max_rates_tensor) / self.tau_rc))) / (intercepts_tensor - 1)</span>
+        <span class="c1"># self.bias = np.expand_dims(self.v_th - self.gain * intercepts_tensor, axis=1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize random encoders</span>
+        <span class="c1"># self.encoders = np.random.randn(n, self.dim)</span>
+        <span class="c1"># self.encoders /= np.linalg.norm(self.encoders, axis=1)[:, np.newaxis]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Reset the state variables to initial conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># &lt;--- ADDED</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span>  <span class="c1"># Time step</span>
+
+        <span class="c1"># Update refractory time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">dt</span>
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="c1"># ensure between 0 and dt</span>
+
+        <span class="c1"># Calculate input current</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">+</span> <span class="n">inputs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+
+        <span class="c1"># Update membrane potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span>
+
+        <span class="c1"># Determine which neurons spike</span>
+        <span class="n">spike_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inh</span>  <span class="c1"># &lt;--- ADDED + self.inh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spike_mask</span> <span class="o">/</span> <span class="n">dt</span>  <span class="c1"># Record spikes in output</span>
+
+        <span class="c1"># Calculate the time of the spike</span>
+        <span class="n">t_spike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]))</span> <span class="o">+</span> <span class="n">dt</span>
+
+        <span class="c1"># Reset voltage of spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Set refractory time for spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">t_spike</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_inh</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inc_inh</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># &lt;--- ADDED</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>  <span class="c1"># Return the output spikes</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_EXCITATORY</span> <span class="o">=</span> <span class="mi">16</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stdp</span> <span class="o">=</span> <span class="n">STDPWeights</span><span class="p">(</span><span class="n">numPre</span><span class="o">=</span><span class="n">DIGIT_SIZE</span><span class="p">,</span> <span class="n">numPost</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">)</span>
+<span class="n">excitatory_neurons</span> <span class="o">=</span> <span class="n">ALIF</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">)</span>
+<span class="n">excitatory_psp</span>     <span class="o">=</span> <span class="n">SynapseCollection</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">step2</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+    <span class="n">input_spikes</span> <span class="o">=</span> <span class="n">poisson_fire</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inp</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">min_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">excitatory_inp</span> <span class="o">=</span> <span class="n">synapses</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">input_spikes</span><span class="p">)</span>
+
+    <span class="n">stdp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">t_step</span><span class="p">)</span>
+    <span class="n">stdp</span><span class="o">.</span><span class="n">updateWeights</span><span class="p">(</span><span class="n">input_spikes</span><span class="p">,</span> <span class="n">excitatory_neurons</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="n">excitatory_inp</span> <span class="o">=</span> <span class="n">inp</span> <span class="o">@</span> <span class="n">stdp</span><span class="o">.</span><span class="n">w</span>
+    <span class="n">excitatory_spikes</span> <span class="o">=</span> <span class="n">excitatory_neurons</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_inp</span><span class="p">)</span>
+    <span class="n">excitatory_outp</span> <span class="o">=</span> <span class="n">excitatory_psp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_spikes</span><span class="p">)</span>
+
+
+<span class="n">step2</span><span class="p">(</span><span class="n">randomImage</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Our goal is going to be to have each excitatory neuron associated with each digit. In order to do that, we want:</p>
+<ol class="arabic simple">
+<li><p>To ensure that none of the neurons get too “greedy” and start firing with every input. For that reason, we implement the excitatory layer with ALIFs, which become less sensitive after they start firing.</p></li>
+<li><p>To try to encourage <em>one</em> neuron to be associated with each digit (we don’t want every neuron to represent a <code class="docutils literal notranslate"><span class="pre">6</span></code>). When a digit is shown, we want to only encourage one neuron to respond. To do this, we add an extra <strong>inhibitory</strong> layer.</p></li>
+</ol>
+<p>The inhibitory layer is a layer of LIF neurons (the same number of neurons as the excitatory layer). Each excitatory neuron has <em>one</em> corresponding inhibitory neuron. But, each inhibitory neuron will inhibit <strong>every other excitatory neuron</strong>. So, when an excitatory <em>x</em> neuron fires, it triggers its associated inhibitory neuron to fire. When that inhibitory neuron fires, it inhibits every excitatory neuron <em>except</em> for <em>x</em>, making it more likely that <em>x</em> is the only excitatory neuron that fires.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inhibitory_neurons</span> <span class="o">=</span> <span class="n">LIF</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">)</span>
+<span class="n">inhibitory_psp</span>     <span class="o">=</span> <span class="n">SynapseCollection</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">inhibitory_outp</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NUM_EXCITATORY</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">step3</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">inhibitory_outp</span>
+    <span class="n">input_spikes</span> <span class="o">=</span> <span class="n">poisson_fire</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inp</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">min_rate</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">excitatory_inp</span> <span class="o">=</span> <span class="n">synapses</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">input_spikes</span><span class="p">)</span>
+
+    <span class="n">stdp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">t_step</span><span class="p">)</span>
+    <span class="n">stdp</span><span class="o">.</span><span class="n">updateWeights</span><span class="p">(</span><span class="n">input_spikes</span><span class="p">,</span> <span class="n">excitatory_neurons</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="n">excitatory_inp</span> <span class="o">=</span> <span class="n">excitatory_inp</span> <span class="o">@</span> <span class="n">stdp</span><span class="o">.</span><span class="n">w</span> <span class="o">+</span> <span class="n">inhibitory_outp</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">excitatory_spikes</span> <span class="o">=</span> <span class="n">excitatory_neurons</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_inp</span><span class="p">)</span>
+    <span class="n">excitatory_outp</span> <span class="o">=</span> <span class="n">excitatory_psp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_spikes</span><span class="p">)</span>
+
+    <span class="n">inhibitory_spikes</span> <span class="o">=</span> <span class="n">inhibitory_neurons</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_outp</span><span class="p">)</span>
+    <span class="n">raw_inhibitory_outp</span>   <span class="o">=</span> <span class="n">inhibitory_psp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inhibitory_spikes</span><span class="p">)</span>
+    <span class="n">total_inhibiry_outp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">raw_inhibitory_outp</span><span class="p">)</span>
+    <span class="n">inhibitory_outp</span> <span class="o">=</span> <span class="n">total_inhibiry_outp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">NUM_EXCITATORY</span><span class="p">)</span> <span class="o">-</span> <span class="n">raw_inhibitory_outp</span>
+
+<span class="n">step3</span><span class="p">(</span><span class="n">randomImage</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><img alt="" src="../_images/mnist_stdp.png" /></p>
+<p>In order make sure that <em>some</em> neuron is responding, we also specify that we can only advance to the next digit if at least <em>5</em> excitatory neurons have fired while showing the digit. If not, then we increase the digit’s intensity (by upping the maximum firing rate and showing that digit for longer).</p>
+<!-- You can see our network running below. At the top is the input. Below that is a grid representing all excitatory neurons. Inside each neuron display is the *weights* associated with each input. --><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t_step</span> <span class="o">=</span> <span class="mf">0.002</span>  <span class="c1"># Time step for the simulation</span>
+<span class="n">synapses</span> <span class="o">=</span> <span class="n">SynapseCollection</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">DIGIT_SIZE</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">)</span>  <span class="c1"># Synapse collection for input connections</span>
+
+<span class="c1"># STDP (Spike-Timing-Dependent Plasticity) weight matrix between input and excitatory neurons</span>
+<span class="n">stdp</span> <span class="o">=</span> <span class="n">STDPWeights</span><span class="p">(</span><span class="n">numPre</span><span class="o">=</span><span class="n">DIGIT_SIZE</span><span class="p">,</span> <span class="n">numPost</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">g_min</span><span class="o">=-</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">g_max</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+
+<span class="c1"># Inhibitory neurons and their corresponding post-synaptic potential (PSP) collection</span>
+<span class="n">inhibitory_neurons</span> <span class="o">=</span> <span class="n">LIF</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">)</span>
+<span class="n">inhibitory_psp</span> <span class="o">=</span> <span class="n">SynapseCollection</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">inhibitory_outp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">NUM_EXCITATORY</span><span class="p">)</span>  <span class="c1"># Initialize inhibitory output array</span>
+
+<span class="c1"># Excitatory neurons and their corresponding PSP collection</span>
+<span class="n">excitatory_neurons</span> <span class="o">=</span> <span class="n">ALIF</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">tau_inh</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+<span class="n">excitatory_psp</span> <span class="o">=</span> <span class="n">SynapseCollection</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">NUM_EXCITATORY</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="c1"># Function to perform a simulation step</span>
+<span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">max_input_rate</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">inhibitory_outp</span>
+    <span class="n">input_spikes</span> <span class="o">=</span> <span class="n">poisson_fire</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inp</span><span class="p">),</span> <span class="n">dt</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">min_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">max_rate</span><span class="o">=</span><span class="n">max_input_rate</span><span class="p">)</span>  <span class="c1"># Generate input spikes</span>
+    <span class="n">input_psp</span> <span class="o">=</span> <span class="n">synapses</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">input_spikes</span><span class="p">)</span>  <span class="c1"># Step the input synapses to get PSP</span>
+
+    <span class="n">stdp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">t_step</span><span class="p">)</span>  <span class="c1"># Step the STDP mechanism</span>
+    <span class="n">stdp</span><span class="o">.</span><span class="n">updateWeights</span><span class="p">(</span><span class="n">input_spikes</span><span class="p">,</span> <span class="n">excitatory_neurons</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>  <span class="c1"># Update weights based on input and output spikes</span>
+
+    <span class="n">excitatory_inp</span> <span class="o">=</span> <span class="n">input_psp</span> <span class="o">@</span> <span class="n">stdp</span><span class="o">.</span><span class="n">w</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">inhibitory_outp</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">a_max</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">a_min</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Calculate excitatory input combining synapse output and inhibitory output</span>
+    <span class="n">excitatory_spikes</span> <span class="o">=</span> <span class="n">excitatory_neurons</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_inp</span><span class="p">)</span>  <span class="c1"># Step excitatory neurons to get their spikes</span>
+
+    <span class="n">excitatory_outp</span> <span class="o">=</span> <span class="n">excitatory_psp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_spikes</span><span class="p">)</span>  <span class="c1"># Update the excitatory post-synaptic potential</span>
+
+    <span class="n">inhibitory_spikes</span> <span class="o">=</span> <span class="n">inhibitory_neurons</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">excitatory_outp</span><span class="p">)</span>  <span class="c1"># Step inhibitory neurons using excitatory output</span>
+    <span class="c1"># print(input_psp@stdp.w, excitatory_inp, excitatory_spikes, excitatory_outp, inhibitory_spikes)</span>
+    <span class="n">raw_inhibitory_outp</span> <span class="o">=</span> <span class="n">inhibitory_psp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inhibitory_spikes</span><span class="p">)</span>  <span class="c1"># Update the inhibitory post-synaptic potential</span>
+    <span class="n">total_inhibitory_outp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">raw_inhibitory_outp</span><span class="p">)</span>  <span class="c1"># Calculate the total inhibitory output</span>
+    <span class="n">inhibitory_outp</span> <span class="o">=</span> <span class="n">total_inhibitory_outp</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">NUM_EXCITATORY</span><span class="p">)</span> <span class="o">-</span> <span class="n">raw_inhibitory_outp</span>  <span class="c1"># Calculate the inhibitory output for each neuron</span>
+
+    <span class="n">num_fires</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">excitatory_spikes</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Count the number of excitatory neurons that fired</span>
+    <span class="k">return</span> <span class="n">num_fires</span>
+
+<span class="k">def</span> <span class="nf">run_simulation</span><span class="p">(</span><span class="n">num_images</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+        <span class="n">current_image</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">trainDataGenerator</span><span class="p">)</span>  <span class="c1"># Get the next image and label from the data generator</span>
+
+        <span class="n">total_fires</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Initialize the total number of fires</span>
+        <span class="n">max_input_rate</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># Initial maximum input firing rate</span>
+
+        <span class="k">while</span> <span class="n">total_fires</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">TIME_TO_SHOW_IMAGES</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>  <span class="c1"># Display the image for a set duration</span>
+                <span class="n">num_fires</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">current_image</span><span class="p">),</span> <span class="n">max_input_rate</span><span class="o">=</span><span class="n">max_input_rate</span><span class="p">)</span>  <span class="c1"># Perform a simulation step</span>
+                <span class="n">total_fires</span> <span class="o">+=</span> <span class="n">num_fires</span>  <span class="c1"># Accumulate the number of fires</span>
+                <span class="k">if</span> <span class="n">total_fires</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span> <span class="k">break</span>  <span class="c1"># Break if the total number of fires is reached (this is different from the original paper but helps run the simulation faster)</span>
+            <span class="n">max_input_rate</span> <span class="o">*=</span> <span class="mf">1.1</span>  <span class="c1"># Increase the input firing rate</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">TIME_TO_SHOW_BLANK</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>  <span class="c1"># Show a blank input for a set duration</span>
+            <span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">current_image</span><span class="p">)),</span> <span class="n">max_input_rate</span><span class="o">=</span><span class="n">max_input_rate</span><span class="p">)</span>  <span class="c1"># Perform a simulation step with blank input</span>
+
+<span class="k">def</span> <span class="nf">plotWeights</span><span class="p">():</span>
+    <span class="n">NUM_DISPLAY_ROWS</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">NUM_DISPLAY_COLS</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_EXCITATORY</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">NUM_DISPLAY_ROWS</span><span class="p">,</span> <span class="n">NUM_DISPLAY_COLS</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">stdp</span><span class="o">.</span><span class="n">w</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">DIGIT_WIDTH</span><span class="p">,</span> <span class="n">DIGIT_HEIGHT</span><span class="p">),</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Randomly initialized weights&quot;</span><span class="p">);</span> <span class="n">plotWeights</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Run simulation for </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> images&quot;</span><span class="p">);</span> <span class="n">run_simulation</span><span class="p">(</span><span class="n">num_images</span><span class="o">=</span><span class="n">n</span><span class="p">);</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Updated weights&quot;</span><span class="p">);</span> <span class="n">plotWeights</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Randomly initialized weights
+</pre></div>
+</div>
+<img alt="../_images/aab13b1e14ebd8437fc5bebf1f55c6a2a93a2b053d710ec44d08f09904029407.png" src="../_images/aab13b1e14ebd8437fc5bebf1f55c6a2a93a2b053d710ec44d08f09904029407.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Run simulation for 100 images
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_1168457/2666458793.py:167: RuntimeWarning: invalid value encountered in log
+  t_spike = self.tau_rc * np.log((self.voltage[spike_mask] - I[spike_mask]) / (self.v_th[spike_mask] - I[spike_mask])) + dt
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Updated weights
+</pre></div>
+</div>
+<img alt="../_images/2827484ba0fd9a5df92be535eb1a81112f39d612db7e8fccfd23e80ba09da758.png" src="../_images/2827484ba0fd9a5df92be535eb1a81112f39d612db7e8fccfd23e80ba09da758.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Run simulation for 1000 images
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Updated weights
+</pre></div>
+</div>
+<img alt="../_images/2e1cb05d1bbb455208196a1a376349d0258bedf1dba16d33d5daa6084c1f92fb.png" src="../_images/2e1cb05d1bbb455208196a1a376349d0258bedf1dba16d33d5daa6084c1f92fb.png" />
+</div>
+</div>
+<p>It takes a while but if you run the simulation for long enough, you can start to see the “imprint” of the input appearing on the weights for a given neuron. Note that we’ve scaled down this example (both the inputs and the number of neurons) so the digits might not be as clear as they would be in a full simulation. It also takes a long time to train, so the weights will be incomplete. However, in the next notebook, we will pre-supply a larger model and execute it.</p>
+<p>This notebook (mostly) follows the paper: Diehl, Peter U., and Matthew Cook. “Unsupervised learning of digit recognition using spike-timing-dependent plasticity.” <span id="id2">[<a class="reference internal" href="18%20-%20Research%20Replication%202.html#id7" title="Peter U Diehl and Matthew Cook. Unsupervised learning of digit recognition using spike-timing-dependent plasticity. Frontiers in computational neuroscience, 9:99, 2015.">DC15</a>]</span> but there are some differences.</p>
+<p>In the paper, there is an additional labeling step (where we analyze each neuron to determine which digit it represents) and testing step (to determine the accuracy). With 6,400 neurons (rather than our 100) and 28 x 28 inputs (rather than our 14 x 14), they achieve an accuracy of 95%. However, we are going to skip these steps (implementation is similar to what we did above) and stick to a smaller network that can run more quickly.</p>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>We created a network that can recognize digits from the MNIST dataset</p></li>
+<li><p>Our network uses primitives that we learned in prior notebooks: LIFs, ALIFs, STDP, and PSPs</p></li>
+<li><p>The STDP weights, which we learn over time, encode the digits being recognized</p></li>
+<li><p>Our network is a scaled down version of the one implemented by Diehl and Cook <span id="id3">[<a class="reference internal" href="18%20-%20Research%20Replication%202.html#id7" title="Peter U Diehl and Matthew Cook. Unsupervised learning of digit recognition using spike-timing-dependent plasticity. Frontiers in computational neuroscience, 9:99, 2015.">DC15</a>]</span></p></li>
+</ul>
+<div class="docutils container" id="id4">
+<div role="list" class="citation-list">
+<div class="citation" id="id8" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>DC15<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>)</span>
+<p>Peter U Diehl and Matthew Cook. Unsupervised learning of digit recognition using spike-timing-dependent plasticity. <em>Frontiers in computational neuroscience</em>, 9:99, 2015.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="16%20-%20STDP.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Learning through Spike-Timing Dependent Plasticity (STDP)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="18%20-%20Research%20Replication%202.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mnist-dataset">MNIST Dataset</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

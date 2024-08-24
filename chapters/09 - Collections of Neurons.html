@@ -1,0 +1,1177 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Collections of Neurons &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/09 - Collections of Neurons';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Translating Data to Spikes" href="10%20-%20Translating%20Data%20to%20Spikes.html" />
+    <link rel="prev" title="Encoding and Decoding Information" href="08%20-%20Encoding%20and%20Decoding%20Information.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html">Basic Neuron Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04%20-%20First%20Order%20LI.html">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="12%20-%20Improving%20Accuracy.html">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16%20-%20STDP.html">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="17%20-%20Research%20Replication%201.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/09 - Collections of Neurons.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/09 - Collections of Neurons.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Collections of Neurons</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="collections-of-neurons">
+<h1>Collections of Neurons<a class="headerlink" href="#collections-of-neurons" title="Link to this heading">#</a></h1>
+<p><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html"><span class="std std-doc">Last time</span></a>, we saw how a single neuron was able to “encode” information in its spike train and how we could compute a “decoder”. We use the same LIF and Synapse models as before (but adding an extra <code class="docutils literal notranslate"><span class="pre">reset</span></code> function for the LIF):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">def</span> <span class="nf">signal</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">FirstOrderLIF</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Potential decay time constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>  <span class="c1"># Potential value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>    <span class="c1"># Firing threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span> <span class="c1"># Refractory period time constant</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span>          <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Current output value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Current refractory period time (how long until the neuron can fire again)</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># If the neuron is not in its refractory period</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="c1"># Integrate the input current</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span> <span class="c1"># If the potential is above the threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="c1"># Enter the refractory period</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>            <span class="c1"># Emit a spike</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                          <span class="c1"># Reset the potential</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># If the potential is below the threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Do not fire</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+    
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># Reset the neuron to its initial state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">class</span> <span class="nc">FirstOrderSynapse</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_s</span>  <span class="o">=</span> <span class="n">tau_s</span> <span class="c1"># Synaptic time constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>     <span class="c1"># Current potential</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_s</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_s</span> <span class="c1"># Decay potential</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+    
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># Reset the synapse to its initial state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we look at <a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html"><span class="std std-doc">the tuning curve of a neuron</span></a> (how it responds to different input values), we get:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">computeTuningCurve</span><span class="p">(</span><span class="n">lif</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">time_limit</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t_step</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">):</span>
+    <span class="n">tuningCurve</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+        <span class="n">spike_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">lif</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">time_limit</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">lif</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">spike_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">rate</span> <span class="o">=</span> <span class="n">spike_count</span> <span class="o">/</span> <span class="n">time_limit</span>
+        <span class="n">tuningCurve</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+    <span class="n">lif</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">tuningCurve</span>
+
+<span class="k">def</span> <span class="nf">analyticalRate</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">I</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">I</span> <span class="o">&lt;=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span> <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>                <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">v_th</span><span class="o">/</span><span class="n">I</span><span class="p">))</span>
+
+<span class="n">neuron</span> <span class="o">=</span> <span class="n">FirstOrderLIF</span><span class="p">()</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="c1"># tuningCurve = computeTuningCurve(neuron, inputs)</span>
+<span class="n">tuningCurve</span> <span class="o">=</span> <span class="p">[</span><span class="n">analyticalRate</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">]</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">tuningCurve</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Input Current&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Firing Rate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Tuning Curves&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/dda5380d0f7a2ca731387f5473035a4031030ac5d0b225b8b761db5a5a8fdf92.png" src="../_images/dda5380d0f7a2ca731387f5473035a4031030ac5d0b225b8b761db5a5a8fdf92.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">psp</span> <span class="o">=</span> <span class="n">FirstOrderSynapse</span><span class="p">(</span><span class="n">tau_s</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">computeDecoder</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">range_low</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">range_high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="n">numerator</span>   <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">range_low</span><span class="p">,</span> <span class="n">range_high</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">analyticalRate</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">numerator</span>   <span class="o">+=</span> <span class="n">r</span><span class="o">*</span><span class="n">i</span>
+        <span class="n">denominator</span> <span class="o">+=</span> <span class="n">r</span><span class="o">*</span><span class="n">r</span>
+    <span class="k">return</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span>
+
+<span class="c1"># plot signal vs time for 12 seconds</span>
+<span class="n">t_step</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">computeDecoder</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The decoder is </span><span class="si">{</span><span class="n">decoder</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">signal_out</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">decoded_output</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">:</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">signal</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+    <span class="n">psp</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+    <span class="n">signal_out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+    <span class="n">decoded_output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">decoder</span> <span class="o">*</span> <span class="n">psp</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">decoded_output</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">signal_out</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Decoded Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Decoded Output&#39;</span><span class="p">,</span> <span class="s1">&#39;Input Signal&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The decoder is 0.3229210069532396
+</pre></div>
+</div>
+<img alt="../_images/3166b19bba28758fd52070ec7789baf750999ba1e7f0bf507689243309af3a9c.png" src="../_images/3166b19bba28758fd52070ec7789baf750999ba1e7f0bf507689243309af3a9c.png" />
+</div>
+</div>
+<p>So far, we have focused on single neurons but in order to convey information effectively, we need <strong>populations</strong> of neurons—not just one. In other words, we are going to move from using one neuron to using many neurons to better represent (and later on, process) our signals. If we work with a population of neurons, each neuron should react differently to the same input (meaning they should have different tuning curves). If two neurons had the exact same tuning curve, they aren’t conveying any more information than one neuron. This should convey more information than just one neuron, which we can verify by decoding the signals of multiple neurons.</p>
+<p>Now that we’re working with multiple neurons, we will also start using the subscript <span class="math notranslate nohighlight">\(_{i}\)</span> to represent neuron <span class="math notranslate nohighlight">\(i\)</span>. We’ll also add three additional terms to scale the input of every neuron:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\alpha_i\)</span>: the <strong>gain</strong>—a multiplicative factor that scales the input</p></li>
+<li><p><span class="math notranslate nohighlight">\(e_i\)</span>: the <strong>encoder</strong>—a scale that decides what “direction” our neuron responds to (in our case, it will be either <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(-1\)</span> to specify if it fires more for positive or negative inputs?)</p></li>
+<li><p><span class="math notranslate nohighlight">\(b_i\)</span>: the <strong>bias</strong>—an bias that we add to the input</p></li>
+</ul>
+<p>This means that for input <span class="math notranslate nohighlight">\(x\)</span>, the effective input for neuron <span class="math notranslate nohighlight">\(i\)</span> will be <span class="math notranslate nohighlight">\(e_{i}\alpha_{i}x + b_i\)</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <span class="math notranslate nohighlight">\(e_{i}\)</span> is negative, our neuron will fire <em>more</em> frequently for negative inputs. Although this does not necessarily make sense in the context of a single isolated neuron, (1) biological realism is not our primary goal and (2) it might correspond to a situation where there is some constant background current and an inhibitory background current.</p>
+<p>It might also seem strange that we separate the gain <span class="math notranslate nohighlight">\(\alpha_{i}\)</span> from the encoder <span class="math notranslate nohighlight">\(e_{i}\)</span>, with <span class="math notranslate nohighlight">\(e\)</span> representing the “direction” that our neuron responds to and <span class="math notranslate nohighlight">\(\alpha\)</span> representing the scale <span id="id1">[<a class="reference internal" href="#id5" title="Terrence C Stewart. A technical overview of the neural engineering framework. University of Waterloo, 2012.">Ste12</a>]</span>. It will make more sense to do this when we have <em>multiple</em> inputs and there’s a notion of “direction” (in other words, how does our neuron react to each input).</p>
+</div>
+<p>Since it can be a little easier to specify the “intercept” (<span class="math notranslate nohighlight">\(x_{int}\)</span>—the input where our neuron starts firing) and the maximum firing rate (<span class="math notranslate nohighlight">\(r_{max}\)</span>—how fast our neuron can fire for the inputs we expect), we can write a function (<code class="docutils literal notranslate"><span class="pre">getGainBias</span></code>) to compute the values of <span class="math notranslate nohighlight">\(\alpha_i\)</span> and <span class="math notranslate nohighlight">\(b_i\)</span> from <span class="math notranslate nohighlight">\(r_{max}\)</span>, <span class="math notranslate nohighlight">\(x_{int}\)</span>, and information about the neuron—<span class="math notranslate nohighlight">\(\tau_{rc}\)</span>, <span class="math notranslate nohighlight">\(\tau_{ref}\)</span>, and <span class="math notranslate nohighlight">\(v_{th}\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">getGainBias</span><span class="p">(</span><span class="n">maxRate</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">tau_rc</span><span class="p">,</span> <span class="n">tau_ref</span><span class="p">,</span> <span class="n">v_th</span><span class="p">):</span>
+    <span class="n">gain</span> <span class="o">=</span> <span class="n">v_th</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">tau_ref</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">maxRate</span><span class="p">)</span> <span class="o">/</span> <span class="n">tau_rc</span><span class="p">)))</span> <span class="o">/</span> <span class="p">(</span><span class="n">intercept</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">bias</span> <span class="o">=</span> <span class="n">v_th</span> <span class="o">-</span> <span class="n">gain</span> <span class="o">*</span> <span class="n">intercept</span>
+
+    <span class="k">return</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span>
+</pre></div>
+</div>
+</div>
+</div>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Where does this code/math for computing the gain and bias come from?</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h2 class="rubric" id="computing-scales-and-biases-optional">Computing Scales and Biases (Optional)</h2>
+<p class="sd-card-text">We could randomly select values of <span class="math notranslate nohighlight">\(\alpha_i\)</span> and <span class="math notranslate nohighlight">\(b_i\)</span> but let’s instead compute them from:</p>
+<ul class="simple">
+<li><p class="sd-card-text">A desired maximum firing rate in the context of an interval, which we will call <span class="math notranslate nohighlight">\(r_{max}\)</span></p></li>
+<li><p class="sd-card-text">A desired intercept, where our neuron starts firing, which we will call <span class="math notranslate nohighlight">\(x_{int}\)</span></p></li>
+</ul>
+<p class="sd-card-text">We can analytically determine <span class="math notranslate nohighlight">\(r(I)\)</span> to estimate a firing rate <a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html#equation-eq-analytical-rate">(5)</a>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}r(I) =
+\begin{cases}
+  0, &amp; \text{if } I \leq v_{th}{}\\
+  \frac{1}{\tau_{ref}-\tau_{rc}\ln{\left(1 - \frac{v_{th}}{I}\right)}}, &amp; \text{otherwise}
+\end{cases}\end{split}\]</div>
+<p class="sd-card-text">We can turn this equation around to ask what <strong>input current</strong> do we need to achieve a given firing rate. In other words, we can leave <span class="math notranslate nohighlight">\(r(I)\)</span> fixed (at <span class="math notranslate nohighlight">\(r\)</span>) and solve for <span class="math notranslate nohighlight">\(I\)</span>. If we do this on the above equation, we get:</p>
+<div class="math notranslate nohighlight">
+\[I = \frac{v_{th}}{1 - e^{\frac{\tau_{ref} - \frac{1}{r}}{\tau_{rc}}}}\]</div>
+<p class="sd-card-text">Let’s call this <span class="math notranslate nohighlight">\(z(r)\)</span> for short:</p>
+<div class="math notranslate nohighlight">
+\[z(r) = \frac{v_{th}}{1 - e^{\frac{\tau_{ref} - \frac{1}{r}}{\tau_{rc}}}}\]</div>
+<p class="sd-card-text">Recall that our effective input given input <span class="math notranslate nohighlight">\(x\)</span> is <span class="math notranslate nohighlight">\(I\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[I(x) = \alpha x + b\]</div>
+<p class="sd-card-text">Let’s suppose that we only care about the possible inputs up to <span class="math notranslate nohighlight">\(1\)</span>. This means that our maximum rate, <span class="math notranslate nohighlight">\(r_{max}\)</span> should be achieved at input <span class="math notranslate nohighlight">\(x=1\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[I_i(1) = 1\alpha_i + b = z(r_{max})\]</div>
+<p class="sd-card-text">or re-arranging:</p>
+<div class="math notranslate nohighlight">
+\[b = z(r_{max}) - \alpha\]</div>
+<p class="sd-card-text">But we know that at our intercept <span class="math notranslate nohighlight">\(x_{int}\)</span>, we should not fire, meaning that it is <strong>right</strong> at the threshold of our firing voltage, <span class="math notranslate nohighlight">\(v_{th}\)</span>: <span class="math notranslate nohighlight">\(I(x_{int}) = v_{th}\)</span>. So we have:</p>
+<div class="math notranslate nohighlight">
+\[I(x_{int}) = v_{th} = \alpha{}x_{int} + b\]</div>
+<p class="sd-card-text">or re-arranging:</p>
+<div class="math notranslate nohighlight">
+\[b = v_{th} - \alpha{}x_{int}\]</div>
+<p class="sd-card-text">Putting both equations for <span class="math notranslate nohighlight">\(b\)</span> together, we get:</p>
+<div class="math notranslate nohighlight">
+\[z(r_{max}) - \alpha = v_{th} - \alpha{}x_{int}\]</div>
+<p class="sd-card-text">…re-arranging:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\alpha &amp;= \frac{v_{th} - z(r_{max})}{x_{int} - 1} \\
+       &amp;= v_{th}\frac{1 - \frac{1}{1 - e^{\frac{\tau_{ref} - \frac{1}{r}}{\tau_{rc}}}}}{x_{int}-1} \\
+\end{align}
+\end{split}\]</div>
+<p class="sd-card-text">and</p>
+<div class="math notranslate nohighlight">
+\[b = v_{th} - \alpha{}x_{int}\]</div>
+</div>
+</details><p>Let’s then write code for representing a collection of that creates a collection of neurons with different tuning curves</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FirstOrderLIFCollection</span><span class="p">:</span> <span class="c1"># Collection of First Order Leaky Integrate and Fire Neurons</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_neurons</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_rate_range</span> <span class="o">=</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span> <span class="n">intercept_range</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">encoder_options</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neurons</span>  <span class="o">=</span> <span class="p">[]</span> <span class="c1"># List of neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gains</span>    <span class="o">=</span> <span class="p">[]</span> <span class="c1"># List of gains (numbers)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">biases</span>   <span class="o">=</span> <span class="p">[]</span> <span class="c1"># List of biases (numbers)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># List of encoders (numbers)</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">):</span>
+            <span class="n">neuron</span> <span class="o">=</span> <span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="n">tau_rc</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="n">tau_ref</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="n">v_th</span><span class="p">)</span>
+            <span class="n">max_rate</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">max_rate_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_rate_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>   <span class="c1"># Maximum firing rate</span>
+            <span class="n">intercept</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">intercept_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intercept_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># Intercept (where the neuron starts firing)</span>
+            <span class="n">encoder</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">encoder_options</span><span class="p">)</span>                         <span class="c1"># Encoder (direction of the neuron&#39;s tuning curve) </span>
+
+            <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span> <span class="o">=</span> <span class="n">getGainBias</span><span class="p">(</span><span class="n">max_rate</span><span class="p">,</span> <span class="n">intercept</span><span class="p">,</span> <span class="n">tau_rc</span><span class="p">,</span> <span class="n">tau_ref</span><span class="p">,</span> <span class="n">v_th</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">neurons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neuron</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gain</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">biases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bias</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encoder</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">neuron</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">encoder</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neurons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">biases</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="p">):</span> <span class="c1"># Loop over neurons, gains, biases, and encoders</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">I</span> <span class="o">*</span> <span class="n">gain</span> <span class="o">*</span> <span class="n">encoder</span> <span class="o">+</span> <span class="n">bias</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span> <span class="c1"># Step the neuron with the input scaled by the gain and encoder, plus the bias</span>
+            <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="c1"># Append the output to the list of outputs</span>
+        <span class="k">return</span> <span class="n">outputs</span>
+    
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># Reset all neurons to their initial state</span>
+        <span class="k">for</span> <span class="n">neuron</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neurons</span><span class="p">:</span>
+            <span class="n">neuron</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s then create a collection of ten neurons with different tuning curves.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_NEURONS</span> <span class="o">=</span> <span class="mi">15</span> 
+<span class="n">lifs</span> <span class="o">=</span> <span class="n">FirstOrderLIFCollection</span><span class="p">(</span><span class="n">NUM_NEURONS</span><span class="p">,</span> <span class="n">max_rate_range</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">computeTuningCurves</span><span class="p">(</span><span class="n">lifs</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">time_limit</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t_step</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">):</span>
+    <span class="n">tuning_curves</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lifs</span><span class="o">.</span><span class="n">neurons</span><span class="p">))</span> <span class="p">]</span>
+    <span class="n">num_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lifs</span><span class="o">.</span><span class="n">neurons</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">inp_idx</span><span class="p">,</span> <span class="n">inp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+        <span class="n">spike_counts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_neurons</span>
+        <span class="n">lifs</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">time_limit</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">lifs</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">outputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">spike_counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">):</span>
+            <span class="n">tuning_curves</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">inp_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">spike_counts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">time_limit</span>
+    <span class="n">lifs</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">tuning_curves</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="c1"># for curve in computeTuningCurves(lifs, inputs):</span>
+<span class="c1">#     plt.plot(inputs, curve)</span>
+<span class="k">for</span> <span class="n">neuron</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">encoder</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lifs</span><span class="o">.</span><span class="n">neurons</span><span class="p">,</span> <span class="n">lifs</span><span class="o">.</span><span class="n">gains</span><span class="p">,</span> <span class="n">lifs</span><span class="o">.</span><span class="n">biases</span><span class="p">,</span> <span class="n">lifs</span><span class="o">.</span><span class="n">encoders</span><span class="p">):</span>
+    <span class="n">tuning_curve</span> <span class="o">=</span> <span class="p">[</span><span class="n">analyticalRate</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">i</span> <span class="o">*</span> <span class="n">gain</span> <span class="o">*</span> <span class="n">encoder</span> <span class="o">+</span> <span class="n">bias</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">tuning_curve</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Input Current&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Firing Rate&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Tuning Curves&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c0e6d9669217a2e8bbcdc0f10844bf25bf9d0655da2e5e75524e1643f59ab70f.png" src="../_images/c0e6d9669217a2e8bbcdc0f10844bf25bf9d0655da2e5e75524e1643f59ab70f.png" />
+</div>
+</div>
+<p>As we can see, all the neurons have different tuning curves as a result of their random gains, biases, and encoders.</p>
+<p>Let’s then also define a <code class="docutils literal notranslate"><span class="pre">FirstOrderSynapseCollection</span></code> class that will represent a collection of synapses for these neurons.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FirstOrderSynapseCollection</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_neurons</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">synapses</span> <span class="o">=</span> <span class="p">[</span><span class="n">FirstOrderSynapse</span><span class="p">(</span><span class="n">tau_s</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_neurons</span><span class="p">)]</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">synapse</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">synapses</span><span class="p">):</span>
+            <span class="n">inp</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">synapse</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+            <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">outputs</span>
+    
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">synapse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">synapses</span><span class="p">:</span>
+            <span class="n">synapse</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then, let’s create a collection of synapses and see what happens with a signal.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">signal</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+<span class="n">synapses</span> <span class="o">=</span> <span class="n">FirstOrderSynapseCollection</span><span class="p">(</span><span class="n">NUM_NEURONS</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="n">lifs</span><span class="p">,</span> <span class="n">synapses</span><span class="p">,</span> <span class="n">input_value</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+    <span class="n">lif_outputs</span>     <span class="o">=</span> <span class="n">lifs</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">input_value</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+    <span class="n">synapse_outputs</span> <span class="o">=</span> <span class="n">synapses</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">lif_outputs</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">synapse_outputs</span>
+
+<span class="n">T_step</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span>
+
+<span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">T</span><span class="p">:</span>
+    <span class="n">input_value</span> <span class="o">=</span> <span class="n">signal</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">lifs</span><span class="p">,</span> <span class="n">synapses</span><span class="p">,</span> <span class="n">input_value</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span>
+    <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Input Signal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Outputs&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5a0f817ea740851066dc5f422dbb477da9f66115c904f958433d1e9dd0a20430.png" src="../_images/5a0f817ea740851066dc5f422dbb477da9f66115c904f958433d1e9dd0a20430.png" />
+<img alt="../_images/9450b6410d35485994dea109c0793c799c929e4e533882b926e3fb7ba89b1379.png" src="../_images/9450b6410d35485994dea109c0793c799c929e4e533882b926e3fb7ba89b1379.png" />
+</div>
+</div>
+<p>Now, if we want to try to re-construct the original signal from these neurons’ outputs, we need to compute the decoders for <strong>multiple</strong> neurons. The procedure is similar to <a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html"><span class="std std-doc">what we did with one neuron</span></a>, except that now we are minimizing the error across several neurons. So now, if we have <span class="math notranslate nohighlight">\(n\)</span> neurons, our decoders <span class="math notranslate nohighlight">\(\vec{\phi}\)</span> will be a vector rather than a single number. We use <span class="math notranslate nohighlight">\(\phi_i\)</span> to refer to the decoder for neuron <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">What’s the math behind computing <span class="math notranslate nohighlight">\(\vec{\phi}\)</span>?</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h2 class="rubric" id="computing-population-decoders-optional">Computing Population Decoders (Optional)</h2>
+<p class="sd-card-text">When we want to compute the decoders for <strong>multiple</strong> neurons, the procedure is similar as it was for one neuron. However, now we are minimizing the error across several neurons. So now, if we have <span class="math notranslate nohighlight">\(n\)</span> neurons, our decoders <span class="math notranslate nohighlight">\(\vec{\phi}\)</span> will be a vector rather than a single number. We use <span class="math notranslate nohighlight">\(\phi_i\)</span> to refer to the decoder for neuron <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[E = \int_{\text{low}}^{\text{high}} \frac{1}{2}[x - \sum_{i=1}^{n} r_i(x)\phi_i]^2 \,dx\]</div>
+<p class="sd-card-text">We could minimize this procedurally (for example, through gradient descent) or analytically. For large numbers of neurons, it’s probably best to do it procedurally but let’s instead do it analytically. We want to find the optimal values for each <span class="math notranslate nohighlight">\(\phi_i\)</span> by looking for the point where <span class="math notranslate nohighlight">\(\frac{\partial{}E(j)}{\partial{}\phi_i} = 0\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial{}E(x)}{\partial{}\phi_i} = \int_{\text{low}}^{\text{high}} -2r_i(x)\frac{1}{2}[x - \sum_{j=1}^{n} r_j(x)\phi_j] \,dx\]</div>
+<p class="sd-card-text">If we set this equal to zero, we have:</p>
+<div class="math notranslate nohighlight">
+\[\int xr_i(x)dx = \int[r_i(x)\sum_{j=1}^{n}r_j(x)\phi_j] \,dx\]</div>
+<p class="sd-card-text">re-arranging</p>
+<div class="math notranslate nohighlight">
+\[\int xr_i(x)dx = \sum_{j=1}^{n}[\int r_i(x)r_j(x) \,dx]\phi_i\]</div>
+<p class="sd-card-text">If we define matrices <span class="math notranslate nohighlight">\(\Upsilon{}\)</span> and <span class="math notranslate nohighlight">\(\Gamma{}\)</span> as follows:</p>
+<div class="math notranslate nohighlight">
+\[\Gamma_{ij} = \int r_i(x)r_j(x)dx\]</div>
+<p class="sd-card-text">and</p>
+<div class="math notranslate nohighlight">
+\[\Upsilon_i = \int xr_i(x)dx\]</div>
+<p class="sd-card-text">then we get</p>
+<div class="math notranslate nohighlight">
+\[\Upsilon = \Gamma \phi\]</div>
+<p class="sd-card-text">or</p>
+<div class="math notranslate nohighlight">
+\[\phi = \Gamma^{-1} \Upsilon\]</div>
+<p class="sd-card-text">We can estimate the integrals for <span class="math notranslate nohighlight">\(\Gamma\)</span> and <span class="math notranslate nohighlight">\(\Upsilon\)</span> through summation.</p>
+<p class="sd-card-text">Two more notes:</p>
+<ol class="arabic simple">
+<li><p class="sd-card-text"><a class="reference external" href="https://link.springer.com/article/10.1007/BF00962720">Some sources</a> recommend adding random noise to be more sure that <span class="math notranslate nohighlight">\(\Gamma\)</span> is invertible. They recommend adding <span class="math notranslate nohighlight">\(\sigma{}\)</span>, the standard deviation of the noise to the diagonal so we will use <span class="math notranslate nohighlight">\(\Gamma + I\)</span> where <span class="math notranslate nohighlight">\(I\)</span> is the identity matrix.</p></li>
+<li><p class="sd-card-text">Our computation of <span class="math notranslate nohighlight">\(\vec{\phi}\)</span> is slightly inaccurate, especially for large numbers of neurons because of some implementation details (the library we use for matrix inversion is not precise…<a class="reference external" href="https://observablehq.com/d/e363ce6cdb928f48?collection=&#64;soney/neuromorphic-computing#cell-399">the optional section below</a> discusses why we use matrix inversion).</p></li>
+</ol>
+</div>
+</details><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">getDecoders</span><span class="p">(</span><span class="n">lifs</span><span class="p">,</span> <span class="n">minJ</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxJ</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stepSize</span><span class="o">=</span><span class="mf">0.01</span><span class="p">):</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">minJ</span><span class="p">,</span> <span class="n">maxJ</span><span class="p">,</span> <span class="n">stepSize</span><span class="p">)</span>
+
+    <span class="c1"># tuningCurves = computeTuningCurves(lifs, inputs)</span>
+    <span class="n">tuningCurves</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">neuron</span><span class="p">,</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span><span class="p">,</span> <span class="n">encoder</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lifs</span><span class="o">.</span><span class="n">neurons</span><span class="p">,</span> <span class="n">lifs</span><span class="o">.</span><span class="n">gains</span><span class="p">,</span> <span class="n">lifs</span><span class="o">.</span><span class="n">biases</span><span class="p">,</span> <span class="n">lifs</span><span class="o">.</span><span class="n">encoders</span><span class="p">):</span>
+        <span class="n">tuningCurves</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">analyticalRate</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">i</span> <span class="o">*</span> <span class="n">gain</span> <span class="o">*</span> <span class="n">encoder</span> <span class="o">+</span> <span class="n">bias</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">])</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tuningCurves</span><span class="p">)</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">Gamma</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">A</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lifs</span><span class="o">.</span><span class="n">neurons</span><span class="p">))</span>
+    <span class="n">GammaInv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">Gamma</span><span class="p">)</span>
+    <span class="n">Upsilon</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">value</span>
+
+    <span class="n">Phi</span> <span class="o">=</span> <span class="n">GammaInv</span> <span class="o">@</span> <span class="n">Upsilon</span>
+
+    <span class="k">return</span> <span class="n">Phi</span>
+
+<span class="n">Phi</span> <span class="o">=</span> <span class="n">getDecoders</span><span class="p">(</span><span class="n">lifs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Phi is: </span><span class="si">{</span><span class="n">Phi</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Phi is: [ 1.25173521e-05  1.82993317e-03 -5.10319914e-03  1.50262571e-03
+ -1.00303516e-03  2.88883235e-04  5.12202562e-03 -9.81927479e-03
+ -5.44357947e-04  4.34728325e-03  1.89612567e-03  2.78694925e-03
+  2.72645357e-04  1.10751640e-02 -8.00340690e-04]
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can use our weights <span class="math notranslate nohighlight">\(\vec{\phi}\)</span> to try to re-construct the original signal by taking the outputs (<code class="docutils literal notranslate"><span class="pre">outputs</span></code>) and doing matrix multiplication with <span class="math notranslate nohighlight">\(\vec{\phi}\)</span>:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">@</span> <span class="n">Phi</span><span class="p">)</span> <span class="c1"># Multiply the outputs by the decoders with matrix multiplication</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Signal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Signal vs Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Decoded Signal&#39;</span><span class="p">,</span> <span class="s1">&#39;Input Signal&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/cb143a2f6a7357a3f5d80de0a7d082f4ea7046d9759cae908e2642f5f1789c81.png" src="../_images/cb143a2f6a7357a3f5d80de0a7d082f4ea7046d9759cae908e2642f5f1789c81.png" />
+</div>
+</div>
+<p>As we can see, even with a small number of neurons, we can re-construct our original input signal fairly well. If we added more neurons, our representation would improve.</p>
+<p>Also, our time constant <span class="math notranslate nohighlight">\(\tau_s\)</span> has an interesting effect on our output. As we decrease its value, our representation gets a little “rougher”, since our PSP decays faster our representation ends up being jerkier. If we increase <span class="math notranslate nohighlight">\(\tau_s\)</span>, we end up with a smoother representation but it becomes increasingly time-delayed and is slower to “react” to the input. The example below shows the output for a large value of <span class="math notranslate nohighlight">\(\tau_s\)</span> (prior value: <code class="docutils literal notranslate"><span class="pre">0.1</span></code>, new value: <code class="docutils literal notranslate"><span class="pre">1.0</span></code>):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lifs</span> <span class="o">=</span> <span class="n">FirstOrderLIFCollection</span><span class="p">(</span><span class="n">NUM_NEURONS</span><span class="p">,</span> <span class="n">max_rate_range</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="n">synapses</span> <span class="o">=</span> <span class="n">FirstOrderSynapseCollection</span><span class="p">(</span><span class="n">NUM_NEURONS</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">T</span><span class="p">:</span>
+    <span class="n">input_value</span> <span class="o">=</span> <span class="n">signal</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">lifs</span><span class="p">,</span> <span class="n">synapses</span><span class="p">,</span> <span class="n">input_value</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span>
+    <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_value</span><span class="p">)</span>
+    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+<span class="n">Phi</span> <span class="o">=</span> <span class="n">getDecoders</span><span class="p">(</span><span class="n">lifs</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">@</span> <span class="n">Phi</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Signal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Signal vs Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Decoded Signal&#39;</span><span class="p">,</span> <span class="s1">&#39;Input Signal&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/a215f87538e66f99bfaa41bbb01897d7d1d75a0a4b46569a10a8bc257cbbcde8.png" src="../_images/a215f87538e66f99bfaa41bbb01897d7d1d75a0a4b46569a10a8bc257cbbcde8.png" />
+</div>
+</div>
+<p>Let’s see what this looks like with a stranger signal (and up the number of neurons a bit to <code class="docutils literal notranslate"><span class="pre">50</span></code>):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lifs</span> <span class="o">=</span> <span class="n">FirstOrderLIFCollection</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_rate_range</span><span class="o">=</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="n">synapses</span> <span class="o">=</span> <span class="n">FirstOrderSynapseCollection</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">signal2</span><span class="p">(</span><span class="n">t</span><span class="p">):</span> <span class="c1"># Create a (strange) signal</span>
+    <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">4</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">((</span><span class="n">t</span><span class="o">%</span><span class="k">1</span>) - 0.5) # Triangle wave for first two seconds
+    <span class="k">elif</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="n">t</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span> <span class="c1"># Square wave for the next three seconds</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span> <span class="c1"># Sine wave for the remainder</span>
+
+<span class="n">T_step</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span>
+<span class="n">signals</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">T</span><span class="p">:</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">signal2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">lifs</span><span class="p">,</span> <span class="n">synapses</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span>
+    <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+<span class="n">Phi</span> <span class="o">=</span> <span class="n">getDecoders</span><span class="p">(</span><span class="n">lifs</span><span class="p">)</span>
+<span class="n">decoded_output</span> <span class="o">=</span> <span class="n">outputs</span> <span class="o">@</span> <span class="n">Phi</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">decoded_output</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Output vs Time&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Decoded Output&#39;</span><span class="p">,</span> <span class="s1">&#39;Input Signal&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/0014016516fb0e4121d9c9242fb1ef6861bbd89d060f2a16f834e49d3dca360d.png" src="../_images/0014016516fb0e4121d9c9242fb1ef6861bbd89d060f2a16f834e49d3dca360d.png" />
+</div>
+</div>
+<div class="custom---editor"
+                                          data-arguments = "[&quot;python&quot;]"
+                                          data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;600px&quot;}"
+                                          data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\nimport math\n\nNUM_NEURONS =     5 #<-SLIDE(2 to 50 by 1)\ntau_s       = 0.100 #<-SLIDE(0.010 to 1 by 0.01)\n\ndef getGainBias(maxRate, intercept, tau_rc, tau_ref, v_th):\n    gain = v_th * (1 - 1 / (1 - np.exp((tau_ref - 1/maxRate) / tau_rc))) / (intercept - 1)\n    bias = v_th - gain * intercept\n\n    return gain, bias\n\nclass FirstOrderLIF: # First Order Leaky Integrate and Fire\n    def __init__(self, tau_rc=0.2, tau_ref=0.002, v_init=0, v_th=1):\n        self.tau_rc  = tau_rc  # Potential decay time constant\n        self.v       = v_init  # Potential value\n        self.v_th    = v_th    # Firing threshold\n        self.tau_ref = tau_ref # Refractory period time constant\n\n        self.output          = 0 # Current output value\n        self.refractory_time = 0 # Current refractory period time (how long until the neuron can fire again)\n    \n    def step(self, I, t_step): # Advance one time step (input I and time step size t_step)\n        self.refractory_time -= t_step # Subtract the amount of time that passed from our refractory time\n\n        if self.refractory_time < 0: # If the neuron is not in its refractory period\n            self.v = self.v * (1 - t_step / self.tau_rc) + I * t_step / self.tau_rc # Integrate the input current\n        \n        if self.v > self.v_th: # If the potential is above the threshold\n            self.refractory_time = self.tau_ref # Enter the refractory period\n            self.output = 1 / t_step            # Emit a spike\n            self.v = 0                          # Reset the potential\n        else: # If the potential is below the threshold\n            self.output = 0 # Do not fire\n        \n        return self.output\n    \n    def reset(self): # Reset the neuron to its initial state\n        self.v = self.output = self.refractory_time = 0\n\nclass FirstOrderSynapse:\n    def __init__(self, tau_s=0.01):\n        self.tau_s  = tau_s # Synaptic time constant\n        self.output = 0     # Current potential\n\n    def step(self, I, t_step):\n        self.output = self.output * (1 - t_step / self.tau_s) + I * t_step / self.tau_s # Decay potential\n        return self.output\n    \n    def reset(self): # Reset the synapse to its initial state\n        self.output = 0\n\n\nclass FirstOrderLIFCollection: # Collection of First Order Leaky Integrate and Fire Neurons\n    def __init__(self, num_neurons, tau_rc=0.02, tau_ref=0.002, v_th=1, max_rate_range = (200, 400), intercept_range = (-1, 1), encoder_options = (-1, 1)):\n        self.neurons  = [] # List of neurons\n        self.gains    = [] # List of gains (numbers)\n        self.biases   = [] # List of biases (numbers)\n        self.encoders = [] # List of encoders (numbers)\n\n        for _ in range(num_neurons):\n            neuron = FirstOrderLIF(tau_rc=tau_rc, tau_ref=tau_ref, v_th=v_th)\n            max_rate  = np.random.uniform(max_rate_range[0], max_rate_range[1])   # Maximum firing rate\n            intercept = np.random.uniform(intercept_range[0], intercept_range[1]) # Intercept (where the neuron starts firing)\n            encoder   = np.random.choice(encoder_options)                         # Encoder (direction of the neuron's tuning curve) \n\n            gain, bias = getGainBias(max_rate, intercept, tau_rc, tau_ref, v_th)\n\n            self.neurons.append(neuron)\n            self.gains.append(gain)\n            self.biases.append(bias)\n            self.encoders.append(encoder)\n    \n    def step(self, I, t_step):\n        outputs = []\n        for neuron, gain, bias, encoder in zip(self.neurons, self.gains, self.biases, self.encoders): # Loop over neurons, gains, biases, and encoders\n            output = neuron.step(I * gain * encoder + bias, t_step) # Step the neuron with the input scaled by the gain and encoder, plus the bias\n            outputs.append(output) # Append the output to the list of outputs\n        return outputs\n    \n    def reset(self): # Reset all neurons to their initial state\n        for neuron in self.neurons:\n            neuron.reset()\n\n\nclass FirstOrderSynapseCollection:\n    def __init__(self, num_neurons, tau_s=0.05):\n        self.synapses = [FirstOrderSynapse(tau_s) for _ in range(num_neurons)]\n    \n    def step(self, inputs, t_step):\n        outputs = []\n        for i, synapse in enumerate(self.synapses):\n            inp = inputs[i]\n            output = synapse.step(inp, t_step)\n            outputs.append(output)\n        return outputs\n    \n    def reset(self):\n        for synapse in self.synapses:\n            synapse.reset()\n\nlifs = FirstOrderLIFCollection(NUM_NEURONS, max_rate_range=(25, 100))\nsynapses = FirstOrderSynapseCollection(NUM_NEURONS, tau_s=tau_s)\n\ndef signal(t):\n    return math.sin(t)\n\ndef step(lifs, synapses, input_value, t_step):\n    lif_outputs     = lifs.step(input_value, t_step)\n    synapse_outputs = synapses.step(lif_outputs, t_step)\n    return synapse_outputs\n\n\ndef getDecoders(lifs, minJ=-1, maxJ=1, stepSize=0.01):\n\n    def analyticalRate(neuron, I):\n        if I <= neuron.v_th: return 0\n        else:                return 1 / (neuron.tau_ref - neuron.tau_rc * np.log(1 - neuron.v_th/I))\n\n    inputs = np.arange(minJ, maxJ, stepSize)\n\n    # tuningCurves = computeTuningCurves(lifs, inputs)\n    tuningCurves = []\n    for neuron, gain, bias, encoder in zip(lifs.neurons, lifs.gains, lifs.biases, lifs.encoders):\n        tuningCurves.append([analyticalRate(neuron, i * gain * encoder + bias) for i in inputs])\n\n    A = np.array(tuningCurves)\n\n    value = np.expand_dims(inputs, axis=1)\n    Gamma = A @ A.T + np.identity(len(lifs.neurons))\n    GammaInv = np.linalg.inv(Gamma)\n    Upsilon = A @ value\n\n    Phi = GammaInv @ Upsilon\n\n    return Phi\n\nPhi = getDecoders(lifs)\n\nT_step = 0.001\nT = np.arange(0, 12, T_step)\n\nsignals = []\noutputs = []\nfor t in T:\n    input_value = signal(t)\n    out = step(lifs, synapses, input_value, T_step)\n    signals.append(input_value)\n    outputs.append(out)\n\nplt.figure()\nplt.plot(T, outputs @ Phi) # Multiply the outputs by the decoders with matrix multiplication\nplt.plot(T, signals, linestyle='--')\nplt.xlabel('Time (s)')\nplt.ylabel('Signal')\nplt.title('Signal vs Time')\nplt.legend(['Decoded Signal', 'Input Signal'])\nplt.show()&quot;"
+                                          id             = "editor-8-hash-737526494346743466"
+                                          ></div><section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>We can compute <strong>decoders</strong> to check that our neurons are able to re-construct an input signal</p></li>
+<li><p>Decoders are generally used for debugging (for the humans creating the SNNs)</p></li>
+<li><p>Our decoders are scalar values (which we called <span class="math notranslate nohighlight">\(\phi{}\)</span>) by which we multiply the post-synaptic potential to get an estimate of the input signal</p></li>
+<li><p>We can create groups of neurons with different gains (<span class="math notranslate nohighlight">\(\alpha{}\)</span>), biases (<span class="math notranslate nohighlight">\(b\)</span>), and encoders (<span class="math notranslate nohighlight">\(e\)</span>) to better represent the input signal</p>
+<ul>
+<li><p>Given input <span class="math notranslate nohighlight">\(x\)</span>, the neuron’s effective input is: <span class="math notranslate nohighlight">\(e\alpha{}x + b\)</span></p></li>
+<li><p>We can then compute a decoder vector, <span class="math notranslate nohighlight">\(\vec{\phi}\)</span>, to decode the original signal</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>The code for computing scales and biases is adapted from <a class="reference external" href="https://github.com/nengo/nengo/blob/dc0419fbe571374d0a55a7f67309dfcb254a2e88/nengo/neurons.py#L130-L201">Nengo’s implementation</a></p></li>
+<li><p>Chris Eliasmith’s <a class="reference external" href="https://mitpress.mit.edu/9780262550604/neural-engineering/">Neural Engineering book</a> contains the derivation used for computing decoders</p></li>
+<li><p>Nengo’s <a class="reference external" href="https://www.nengo.ai/nengo/examples/advanced/nef-algorithm.html">NEF Algorithm code</a> is a good example of how to build and understand encoders</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<div class="docutils container" id="id2">
+<div role="list" class="citation-list">
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>AAA+23<span class="fn-bracket">]</span></span>
+<p>Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, and others. Gpt-4 technical report. <em>arXiv preprint arXiv:2303.08774</em>, 2023.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>DC15<span class="fn-bracket">]</span></span>
+<p>Peter U Diehl and Matthew Cook. Unsupervised learning of digit recognition using spike-timing-dependent plasticity. <em>Frontiers in computational neuroscience</em>, 9:99, 2015.</p>
+</div>
+<div class="citation" id="id3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>MMRS06<span class="fn-bracket">]</span></span>
+<p>John McCarthy, Marvin L Minsky, Nathaniel Rochester, and Claude E Shannon. A proposal for the dartmouth summer research project on artificial intelligence, august 31, 1955. <em>AI magazine</em>, 27(4):12–12, 2006.</p>
+</div>
+<div class="citation" id="id5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">Ste12</a><span class="fn-bracket">]</span></span>
+<p>Terrence C Stewart. A technical overview of the neural engineering framework. <em>University of Waterloo</em>, 2012.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="08%20-%20Encoding%20and%20Decoding%20Information.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Encoding and Decoding Information</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="10%20-%20Translating%20Data%20to%20Spikes.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Translating Data to Spikes</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,930 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Firing Rates and Tuning Curves &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/06 - Firing Rates and Tuning Curves';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Synapses" href="07%20-%20Synapses.html" />
+    <link rel="prev" title="Implementing Firing in LIF Neurons" href="05%20-%20Implementing%20Firing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html">Basic Neuron Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04%20-%20First%20Order%20LI.html">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="09%20-%20Collections%20of%20Neurons.html">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="12%20-%20Improving%20Accuracy.html">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16%20-%20STDP.html">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="17%20-%20Research%20Replication%201.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/06 - Firing Rates and Tuning Curves.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/06 - Firing Rates and Tuning Curves.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Firing Rates and Tuning Curves</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="firing-rates-and-tuning-curves">
+<h1>Firing Rates and Tuning Curves<a class="headerlink" href="#firing-rates-and-tuning-curves" title="Link to this heading">#</a></h1>
+<p>One way to summarize the important aspects of what a neuron “does” is to summarize how it responds to a variety of inputs. We’re going to use <a class="reference internal" href="05%20-%20Implementing%20Firing.html"><span class="std std-doc">the LIF model from before</span></a>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FirstOrderLIF</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Potential decay time constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>  <span class="c1"># Potential value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>    <span class="c1"># Firing threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span> <span class="c1"># Refractory period time constant</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span>          <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Current output value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Current refractory period time (how long until the neuron can fire again)</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># If the neuron is not in its refractory period</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="c1"># Integrate the input current</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span> <span class="c1"># If the potential is above the threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="c1"># Enter the refractory period</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>            <span class="c1"># Emit a spike</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                          <span class="c1"># Reset the potential</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># If the potential is below the threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Do not fire</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So let’s see what happens if we input a <em>constant</em> current. We’re going to create a LIF neuron with parameters <span class="math notranslate nohighlight">\(\tau_{rc} = 0.02\)</span> and <span class="math notranslate nohighlight">\(\tau_{ref} = 0.2\)</span> and plot the spikes of our LIF neuron given a constant inputs of varying intensities.</p>
+<p>Let’s see what happens when we call our function with an input <em>slightly</em> over 1A (<code class="docutils literal notranslate"><span class="pre">1.0000001</span></code>):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">def</span> <span class="nf">fullPlot</span><span class="p">(</span><span class="n">I</span><span class="p">):</span>
+    <span class="n">duration</span> <span class="o">=</span> <span class="mi">20</span>  <span class="c1"># Duration of the simulation</span>
+    <span class="n">T_step</span> <span class="o">=</span> <span class="mf">0.001</span> <span class="c1"># Time step size</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span> <span class="c1"># Create a range of time values</span>
+
+    <span class="n">neuron</span> <span class="o">=</span> <span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span> <span class="c1"># Create a new LIF neuron</span>
+
+    <span class="n">I_history</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">v_history</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">output_history</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">vth_history</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span> <span class="c1"># Iterate over each time step</span>
+        <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span> <span class="c1"># Advance the neuron one time step</span>
+
+        <span class="n">I_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">I</span><span class="p">)</span>    <span class="c1"># Record the input current</span>
+        <span class="n">v_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="c1"># Record the neuron&#39;s potential</span>
+        <span class="n">output_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">output</span> <span class="o">*</span> <span class="n">T_step</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># Record the neuron&#39;s output (scaled)</span>
+        <span class="n">vth_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">v_th</span><span class="p">)</span> <span class="c1"># Record the neuron&#39;s threshold</span>
+
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span> <span class="c1"># Create a new figure</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">I_history</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">vth_history</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">v_history</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">output_history</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span> <span class="c1"># Label the x-axis</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Input current&#39;</span><span class="p">,</span> <span class="s1">&#39;neuron.v_th&#39;</span><span class="p">,</span> <span class="s1">&#39;neuron.v&#39;</span><span class="p">,</span> <span class="s1">&#39;neuron.output&#39;</span><span class="p">])</span> <span class="c1"># Add a legend</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Display the plot</span>
+
+<span class="n">fullPlot</span><span class="p">(</span><span class="mf">1.1</span><span class="p">)</span> <span class="c1"># Run the simulation with an input current of 1.1</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/78d378d5ca5b2021bf1cd584530efbe1efea90f253ca9c6835c229d8ac01cbb0.png" src="../_images/78d378d5ca5b2021bf1cd584530efbe1efea90f253ca9c6835c229d8ac01cbb0.png" />
+</div>
+</div>
+<p>If we don’t have sufficient input (for example, if <code class="docutils literal notranslate"><span class="pre">I</span></code> is <code class="docutils literal notranslate"><span class="pre">0.95</span></code>), our neuron never fires</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fullPlot</span><span class="p">(</span><span class="n">I</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/9d0082f9b2759cafa56d329c4bef6bfdd360350ab04c0b8ca86192e109dfdf7c.png" src="../_images/9d0082f9b2759cafa56d329c4bef6bfdd360350ab04c0b8ca86192e109dfdf7c.png" />
+</div>
+</div>
+<hr class="docutils" />
+<p>We don’t really need to see anything but the spikes, so let’s create a different view of these with only the spikes. If we put our input <code class="docutils literal notranslate"><span class="pre">I</span></code> to be <em>barely</em> above <code class="docutils literal notranslate"><span class="pre">1</span></code> (to <code class="docutils literal notranslate"><span class="pre">1.0000001</span></code>), our neuron will fire again:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="k">def</span> <span class="nf">plotSpikes</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">t_step</span><span class="p">,</span> <span class="n">input_current</span><span class="p">):</span>
+    <span class="c1"># Lists to record spike times and membrane potential</span>
+    <span class="n">spike_times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">time_points</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Run the simulation</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">while</span> <span class="n">time</span> <span class="o">&lt;</span> <span class="n">duration</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">input_current</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+        <span class="n">time_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># neuron fires a spike</span>
+            <span class="n">spike_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">+=</span> <span class="n">t_step</span>
+
+    <span class="c1"># Plot the spikes as vertical lines</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">spike_time</span> <span class="ow">in</span> <span class="n">spike_times</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">spike_time</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>  <span class="c1"># Turn off the axes</span>
+
+    <span class="c1"># Calculate and display the output message</span>
+    <span class="n">num_spikes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spike_times</span><span class="p">)</span>
+    <span class="n">spike_rate</span> <span class="o">=</span> <span class="n">num_spikes</span> <span class="o">/</span> <span class="n">duration</span>
+    <span class="n">output_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;An input of </span><span class="si">{</span><span class="n">input_current</span><span class="si">}</span><span class="s2"> produces </span><span class="si">{</span><span class="n">num_spikes</span><span class="si">}</span><span class="s2"> spikes in </span><span class="si">{</span><span class="n">duration</span><span class="si">}</span><span class="s2"> seconds (</span><span class="si">{</span><span class="n">spike_rate</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> Hz)&quot;</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">output_message</span>
+
+<span class="n">plotSpikes</span><span class="p">(</span><span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span> <span class="n">duration</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">input_current</span><span class="o">=</span><span class="mf">1.0000001</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/117283b0529292f04d4244740f93c123cf1fa17072df6c858568c910d0fbcbea.png" src="../_images/117283b0529292f04d4244740f93c123cf1fa17072df6c858568c910d0fbcbea.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;An input of 1.0000001 produces 39 spikes in 20 seconds (1.95 Hz)&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can see that our neuron fires <em>about</em> twice per second, making its firing rate ~2Hz. If we increase our input to <code class="docutils literal notranslate"><span class="pre">1.1</span></code>, we can see that it fires more frequently:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotSpikes</span><span class="p">(</span><span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span> <span class="n">duration</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">input_current</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/202fc5f8c422ff060225c31a9e6d580d481069007ff4e7d2b889f95470675eaa.png" src="../_images/202fc5f8c422ff060225c31a9e6d580d481069007ff4e7d2b889f95470675eaa.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;An input of 1.1 produces 82 spikes in 20 seconds (4.10 Hz)&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>Increase it some more (to <code class="docutils literal notranslate"><span class="pre">10</span></code>), and it will fire even more frequently.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotSpikes</span><span class="p">(</span><span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span> <span class="n">duration</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">input_current</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/889cdaccc4cb395a56c1b1e3cf05daaaba4942326dcd0a9dc754f8d9eeee0f83.png" src="../_images/889cdaccc4cb395a56c1b1e3cf05daaaba4942326dcd0a9dc754f8d9eeee0f83.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;An input of 10 produces 99 spikes in 20 seconds (4.95 Hz)&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>But we can only increase it so much, thanks to the refractory time. If we increase our incoming current significantly (to <code class="docutils literal notranslate"><span class="pre">100</span></code>), our spike frequency barely changes:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotSpikes</span><span class="p">(</span><span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span> <span class="n">duration</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">input_current</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/544194983fd286350dea158d457caceb45bb11a8551c4bd2401a61e98e86a6d5.png" src="../_images/544194983fd286350dea158d457caceb45bb11a8551c4bd2401a61e98e86a6d5.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;An input of 100 produces 100 spikes in 20 seconds (5.00 Hz)&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>However, if we don’t input enough current, our neuron never spikes, as the potential leaks out faster than it can be added.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotSpikes</span><span class="p">(</span><span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span> <span class="n">duration</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">input_current</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/bebe5a848d319312b7f13994129065212d11a7d5c66f1f413cfc6dd681df5482.png" src="../_images/bebe5a848d319312b7f13994129065212d11a7d5c66f1f413cfc6dd681df5482.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;An input of 0.8 produces 0 spikes in 20 seconds (0.00 Hz)&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>As we can see, different inputs lead to different spike frequencies. We can plot this relationship between input and output as a graph, which is called a tuning curve. Let’s plot the tuning curve of our neuron, where the x-axis is the input current and the y-axis is the output firing rate:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">getSpikeRate</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">numSeconds</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">T_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the spike rate of a neuron for a given input current</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Will store the number of spikes</span>
+    <span class="n">numSteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numSeconds</span> <span class="o">/</span> <span class="n">T_step</span><span class="p">)</span> <span class="c1"># How many times we need to call step()</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numSteps</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">T_step</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># If the neuron fired a spike, add it to our cou nt</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">count</span> <span class="o">/</span> <span class="n">numSeconds</span> <span class="c1"># To get the *rate*, divide by the number of seconds</span>
+
+<span class="n">inputs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">10.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span> <span class="c1"># Create a range of input values (0 to 10.1)</span>
+<span class="n">output_rates</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span> <span class="c1"># Iterate over each input value</span>
+    <span class="n">output_rate</span> <span class="o">=</span> <span class="n">getSpikeRate</span><span class="p">(</span><span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span> <span class="n">inp</span><span class="p">)</span> <span class="c1"># Get the spike rate for that input</span>
+    <span class="n">output_rates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output_rate</span><span class="p">)</span> <span class="c1"># Store the output rate</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span> <span class="c1"># Create a new figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">output_rates</span><span class="p">)</span> <span class="c1"># Plot the input rates</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Input current&#39;</span><span class="p">)</span> <span class="c1"># Label the x-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output rate&#39;</span><span class="p">)</span> <span class="c1"># Label the y-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Display the plot</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ddffb9719f73fe117ee7a170d515ce74577942dc504bc29d2d28e2f714d2ff4e.png" src="../_images/ddffb9719f73fe117ee7a170d515ce74577942dc504bc29d2d28e2f714d2ff4e.png" />
+</div>
+</div>
+<p>In the code above, we calculated the output rate with the <code class="docutils literal notranslate"><span class="pre">getSpikeRate</span></code> function, which “runs” the neuron with a given input to get the spike rate for input <span class="math notranslate nohighlight">\(I\)</span>, <span class="math notranslate nohighlight">\(r(I)\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-eq-analytical-rate">
+<span class="eqno">(5)<a class="headerlink" href="#equation-eq-analytical-rate" title="Link to this equation">#</a></span>\[\begin{split}
+r(I) =
+\begin{cases}
+  0 &amp; \text{if } I \leq v_{th}\\
+  \frac{1}{\tau_{ref}-\tau_{rc}\ln{\left(1 - \frac{v_{th}}{I}\right)}} &amp; \text{otherwise}
+\end{cases}
+\end{split}\]</div>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">How did we get this formula?</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h1 class="rubric" id="optional-analytically-computing-lif-responses">(Optional) Analytically Computing LIF Responses</h1>
+<p class="sd-card-text">Recall our equation defining <span class="math notranslate nohighlight">\(v'(t)\)</span> <a class="reference internal" href="04%20-%20First%20Order%20LI.html#equation-eq-vprime">(2)</a>:</p>
+<div class="math notranslate nohighlight">
+\[v'(t) = \frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t)\]</div>
+<p class="sd-card-text">When we have a function whose rate of change is proportional to its value (as <span class="math notranslate nohighlight">\(v(t)\)</span> is), we call it an <em>exponential</em> function. For example, <span class="math notranslate nohighlight">\(e^x\)</span> is an exponential function because its derivative is itself: <span class="math notranslate nohighlight">\(\frac{de^x}{dx} = e^x\)</span>. In this case, <span class="math notranslate nohighlight">\(v(t)\)</span> <em>decays</em> exponentially (as opposed to growing exponentially), which is the case when <span class="math notranslate nohighlight">\(x &lt; 0\)</span>.</p>
+<p class="sd-card-text">So generally, whenever we have a rate of change of something (in this case, <span class="math notranslate nohighlight">\(v'(t)\)</span>) that is proportional to the thing itself (in this case, <span class="math notranslate nohighlight">\(v(t)\)</span>), there’s a good chance that the solution involves either <span class="math notranslate nohighlight">\(e^{...}\)</span> or <span class="math notranslate nohighlight">\(sin(...)\)</span>, whose derivatives are proportional to themselves (and are related by Euler’s formula). Coming back to our function, one definition of <span class="math notranslate nohighlight">\(v(t)\)</span> that satisfies our constraints is:</p>
+<div class="math notranslate nohighlight">
+\[v(t) = I(t) + (v(t-\Delta{}t) - I(t))e^{-\frac{\Delta{}t}{\tau_{rc}}}\]</div>
+<p class="sd-card-text">If we want to compute the time that it takes to get from <span class="math notranslate nohighlight">\(v = 0\)</span> to the firing threshold <span class="math notranslate nohighlight">\(v = v_{th}\)</span> under a constant input current <span class="math notranslate nohighlight">\(I\)</span>, we first need to assume that the input current is high enough: <span class="math notranslate nohighlight">\(I &gt; v_{th}\)</span>. Then, we can solve for how long it takes to reach <span class="math notranslate nohighlight">\(v_{th}\)</span> (which we will call <span class="math notranslate nohighlight">\(t_{th}\)</span>), we can sub in <span class="math notranslate nohighlight">\(t_{th}\)</span> for <span class="math notranslate nohighlight">\(\Delta{}t\)</span>, <span class="math notranslate nohighlight">\(0\)</span> for <span class="math notranslate nohighlight">\(v(t)\)</span>, and <span class="math notranslate nohighlight">\(v_{th}\)</span> for <span class="math notranslate nohighlight">\(v(t)\)</span> in the above formula:</p>
+<div class="math notranslate nohighlight">
+\[v_{th} = I + (0 - I)e^{-\frac{t_{th}}{\tau_{rc}}}\]</div>
+<p class="sd-card-text">Moving terms around, we get:</p>
+<div class="math notranslate nohighlight">
+\[e^{-\frac{t_{th}}{\tau_{rc}}} = 1 - \frac{v_{th}}{I}\]</div>
+<p class="sd-card-text">giving us:</p>
+<div class="math notranslate nohighlight">
+\[t_{th} = -\tau_{rc}\ln{\left(1 - \frac{v_{th}}{I}\right)}\]</div>
+<p class="sd-card-text">To compute the time that it takes to fire and recover, we need to add the refractory time (<span class="math notranslate nohighlight">\(\tau_{ref}\)</span>). This means the time that it takes to fire is:</p>
+<div class="math notranslate nohighlight">
+\[\tau_{ref}-\tau_{rc}\ln{\left(1 - \frac{v_{th}}{I}\right)}\]</div>
+<p class="sd-card-text">and to get the firing rate <span class="math notranslate nohighlight">\(r(I)\)</span> for a given input <span class="math notranslate nohighlight">\(I\)</span>, we take its inverse:</p>
+<div class="math notranslate nohighlight">
+\[r(I) = \frac{1}{\tau_{ref}-\tau_{rc}\ln{\left(1 - \frac{v_{th}}{I}\right)}}\]</div>
+<p class="sd-card-text">However, all of this only applies if <span class="math notranslate nohighlight">\(I &gt; v_{th}\)</span>, leaving us with the final equation:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+r(I) =
+\begin{cases}
+  0 &amp; \text{if } I \leq v_{th}\\
+  \frac{1}{\tau_{ref}-\tau_{rc}\ln{\left(1 - \frac{v_{th}}{I}\right)}} &amp; \text{otherwise}
+\end{cases}
+\end{split}\]</div>
+</div>
+</details><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">analyticalRate</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">I</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">I</span> <span class="o">&lt;=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">neuron</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">neuron</span><span class="o">.</span><span class="n">v_th</span><span class="o">/</span><span class="n">I</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span> <span class="c1"># Create a new figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">output_rates</span><span class="p">)</span> <span class="c1"># Plot the input rates</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">[</span><span class="n">analyticalRate</span><span class="p">(</span><span class="n">FirstOrderLIF</span><span class="p">(</span><span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span> <span class="n">I</span><span class="p">)</span> <span class="k">for</span> <span class="n">I</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">)</span> <span class="c1"># Plot the analytical rates</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Input current&#39;</span><span class="p">)</span> <span class="c1"># Label the x-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Output rate&#39;</span><span class="p">)</span> <span class="c1"># Label the y-axis</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;Simulated&#39;</span><span class="p">,</span> <span class="s1">&#39;Analytical&#39;</span><span class="p">])</span> <span class="c1"># Add a legend</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span> <span class="c1"># Display the plot</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/d719f693caf273e32c74f25dbd52d8b1858f2bcce657568d6e8004bc93911b15.png" src="../_images/d719f693caf273e32c74f25dbd52d8b1858f2bcce657568d6e8004bc93911b15.png" />
+</div>
+</div>
+<p>This looks like a good match! The firing rate that we computed analytically matches what we observe in the simulation.</p>
+<p>Now, try modifying the LIF parameters below (<code class="docutils literal notranslate"><span class="pre">tau_ref</span></code>, <code class="docutils literal notranslate"><span class="pre">tau_rc</span></code>, and <code class="docutils literal notranslate"><span class="pre">v_th</span></code>) and see how the tuning curve changes.</p>
+<div class="custom---editor"
+                                          data-arguments = "[&quot;python&quot;]"
+                                          data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;600px&quot;}"
+                                          data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\n\ntau_ref = 0.200 # <-SLIDE(0 to 2 by 0.001)\ntau_rc  = 0.300 # <-SLIDE(0.1 to 1 by 0.001)\nv_th    = 1.00  # <-SLIDE(0.1 to 5 by 0.01)\n\ndef analyticalRate(neuron, I):\n    if I <= neuron.v_th:\n        return 0\n    else:\n        return 1 / (neuron.tau_ref - neuron.tau_rc * np.log(1 - neuron.v_th/I))\n\nclass FirstOrderLIF: # First Order Leaky Integrate and Fire\n    def __init__(self, tau_rc=0.2, tau_ref=0.002, v_init=0, v_th=1):\n        self.tau_rc  = tau_rc  # Potential decay time constant\n        self.v       = v_init  # Potential value\n        self.v_th    = v_th    # Firing threshold\n        self.tau_ref = tau_ref # Refractory period time constant\n\n        self.output          = 0 # Current output value\n        self.refractory_time = 0 # Current refractory period time (how long until the neuron can fire again)\n    \n    def step(self, I, t_step): # Advance one time step (input I and time step size t_step)\n        self.refractory_time -= t_step # Subtract the amount of time that passed from our refractory time\n\n        if self.refractory_time < 0: # If the neuron is not in its refractory period\n            self.v = self.v * (1 - t_step / self.tau_rc) + I * t_step / self.tau_rc # Integrate the input current\n        \n        if self.v > self.v_th: # If the potential is above the threshold\n            self.refractory_time = self.tau_ref # Enter the refractory period\n            self.output = 1 / t_step            # Emit a spike\n            self.v = 0                          # Reset the potential\n        else: # If the potential is below the threshold\n            self.output = 0 # Do not fire\n        \n        return self.output\n\nneuron = FirstOrderLIF(tau_rc=tau_rc, tau_ref=tau_ref, v_th=v_th)\n\ninputs = np.arange(0, 10.1, 0.01)\noutput_rates = [analyticalRate(neuron, i) for i in inputs]\n\nplt.figure()\nplt.plot(inputs, output_rates)\nplt.xlabel('Input current') # Label the x-axis\nplt.ylabel('Output rate') # Label the y-axis\nplt.show()&quot;"
+                                          id             = "editor-6-hash7514217154131111652"
+                                          ></div><p>So we can see that our neuron does not react to current until it reaches <span class="math notranslate nohighlight">\(v_{th}\)</span>. At that point, it starts firing and its firing rate is proportional to the incoming current. The firing rate eventually flattens out, thanks to the refractory time (the period where the neuron can’t fire).</p>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>A tuning curve summarizes a neuron’s response (in the form of a firing rate) to a variety of inputs</p></li>
+<li><p>Neurons start firing at the threshold potential <span class="math notranslate nohighlight">\(v_{th}\)</span> and the firing rate rises as the input increases (but rises at a decreasing rate)</p></li>
+<li><p>As long as there is some refractory time, our neuron’s firing rate will “flatten” out to a maximum value</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Chris Eliasmith’s <a class="reference external" href="https://mitpress.mit.edu/9780262550604/neural-engineering/">Neural Engineering book</a> contains the derivation used for analytically computing LIF responses</p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/watch?v=JCA2gOhN5oM&amp;amp;list=PLYLu6sY3jnoXTrkfA_WMn0nF_FGz-MaiJ&amp;amp;index=2">The Nengo summer school lectures</a> clearly describe how tuning curves work</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="05%20-%20Implementing%20Firing.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Implementing Firing in LIF Neurons</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="07%20-%20Synapses.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Synapses</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

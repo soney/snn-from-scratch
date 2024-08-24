@@ -1,0 +1,1246 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Improving Accuracy &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/12 - Improving Accuracy';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Neuron Collections" href="13%20-%20Neuron%20Collections.html" />
+    <link rel="prev" title="Representing 2D Images" href="11%20-%20Representing%202D%20Images.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html">Basic Neuron Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04%20-%20First%20Order%20LI.html">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="09%20-%20Collections%20of%20Neurons.html">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16%20-%20STDP.html">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="17%20-%20Research%20Replication%201.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/12 - Improving Accuracy.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/12 - Improving Accuracy.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Improving Accuracy</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-benefit">Measuring the Benefit</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#improving-accuracy-for-synapses">Improving Accuracy for Synapses</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="improving-accuracy">
+<h1>Improving Accuracy<a class="headerlink" href="#improving-accuracy" title="Link to this heading">#</a></h1>
+<p>Our implementation of LIF neurons is good enough for many applications but there are lots of ways in which our implementation is imprecise. Namely:</p>
+<ol class="arabic simple">
+<li><p>If the refractory period ends in the middle of a step (if <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">self.refractory_time</span> <span class="pre">&lt;</span> <span class="pre">t_step</span></code>) then we pretend that the refractory time ended at the beginning of the step. In reality, the voltage shouldn’t have updated for the part of the step where we were in refractory time.</p></li>
+<li><p>If a neuron fires in the middle of a timestep—between <span class="math notranslate nohighlight">\((t - T_{step})\)</span> and <span class="math notranslate nohighlight">\(t\)</span>—then we are effectively “rounding” the firing time to the nearest timestep, since we assign <code class="docutils literal notranslate"><span class="pre">self.refractory_time</span> <span class="pre">=</span> <span class="pre">self.tau_ref</span></code> at the end of the step (whereas some of the refractory time should have passed before the step end).</p></li>
+<li><p>We are using Euler’s method as a first-order approximation of <code class="docutils literal notranslate"><span class="pre">self.v</span></code>, which has some error (which is magnified for larger values of <span class="math notranslate nohighlight">\(T_{step}\)</span>).</p></li>
+</ol>
+<p>We can actually “correct” all of these inaccuracies at little computational cost. In fact, by adding accuracy, we can <em>reduce</em> computational cost by running our simulation in larger time steps. You can look at the optional descriptions below to see how we can rectify all of these:</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">1. Accurately Setting the Refractory Time</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h2 class="rubric" id="accurately-setting-the-refractory-time-optional">Accurately Setting the Refractory Time (Optional)</h2>
+<p class="sd-card-text">Recall that:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) \approx v(t)(1 - \frac{\Delta{}t}{\tau_{rc}}) + \frac{\Delta{}t}{\tau_{rc}}I(t)\]</div>
+<p class="sd-card-text">Now, consider the image below, which represents a neuron crossing the threshold voltage (<span class="math notranslate nohighlight">\(v_{th}\)</span> in the diagram) at some time between <span class="math notranslate nohighlight">\((t - \Delta{}t)\)</span> and <span class="math notranslate nohighlight">\(t\)</span>. We will call this time <span class="math notranslate nohighlight">\(t_{th}\)</span>.</p>
+<p class="sd-card-text"><img alt="" src="../_images/lif_precision.png" /></p>
+<p class="sd-card-text">As this image shows, our neuron <strong>should</strong> exit the refractory period at time <span class="math notranslate nohighlight">\((t - \Delta{}t + t_{th} + \tau_{ref})\)</span>. However, it is currently incorrectly exiting the refractory period at time <span class="math notranslate nohighlight">\((t + \tau_{ref})\)</span>. Let’s rectify this. First, we need to figure out <span class="math notranslate nohighlight">\(t_{th}\)</span>.</p>
+<p class="sd-card-text">We know that <span class="math notranslate nohighlight">\(v(t - \Delta{}t + t_{th}) = v_{th}\)</span> . Using Euler’s above, we get:</p>
+<div class="math notranslate nohighlight">
+\[v(t - \Delta{}t + t_{th}) = v_{th} = (1 - \frac{t_{th}}{\tau_{rc}})v(t-\Delta{}t) + \frac{I(t)t_{th}}{\tau_{rc}}\]</div>
+<p class="sd-card-text">Moving things around, we get:</p>
+<div class="math notranslate nohighlight">
+\[t_{th} = \tau_{rc}\frac{v_{th} - v(t - \Delta{}t)}{I(t) - v(t-\Delta{}t)}\]</div>
+<p class="sd-card-text">It can be a little more convenient to rewrite this using <span class="math notranslate nohighlight">\(v(t)\)</span> (the potential now) rather than <span class="math notranslate nohighlight">\(v(t - \Delta{}t)\)</span> (the potential in the last timestep). We know that they are related by <span class="math notranslate nohighlight">\(v(t) = v(t-\Delta{}t)(1 - \frac{\Delta{}t}{\tau_{rc}}) + \frac{I(t)\Delta{}t}{\tau_{rc}}\)</span>. Or converseley, <span class="math notranslate nohighlight">\(v(t - \Delta{}t) =\frac{\tau_{rc}v(t) - I(t)\Delta{}t}{\tau_{rc}-\Delta{}t}\)</span>. Doing the math, you will find that we can solve for <span class="math notranslate nohighlight">\(t_{th}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[t_{th} = \frac{\tau_{rc}(v_{th} - v(t)) + \Delta{}t(I(t) - v_{th})}{I(t) - v(t)}\]</div>
+<p class="sd-card-text">Now, rather than assigning <code class="docutils literal notranslate"><span class="pre">self.refractory_time</span> <span class="pre">=</span> <span class="pre">self.tau_ref</span></code>, we can be more precise and take into account the actual spike time:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spike_time</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">t_step</span> <span class="o">*</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">spike_time</span> <span class="c1"># Start refractory countdown</span>
+</pre></div>
+</div>
+<p class="sd-card-text">Note that we need to do this <em>before</em> setting <code class="docutils literal notranslate"><span class="pre">self.v</span> <span class="pre">=</span> <span class="pre">0</span></code>. Let’s see what this code actually looks like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FirstOrderLIF1</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># If we aren&#39;t in our refractory period, update the voltage</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>      <span class="c1"># Voltage is above the threshold</span>
+            <span class="c1"># vvv CHANGED vvv #</span>
+            <span class="n">spike_time</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">t_step</span> <span class="o">*</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">spike_time</span> <span class="c1"># Start refractory countdown</span>
+            <span class="c1"># ^^^ CHANGED ^^^ #</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>                         <span class="c1"># Fire</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                                       <span class="c1"># Reset potential</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>          <span class="c1"># Don&#39;t fire</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">2. Accurately Updating Voltage</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h2 class="rubric" id="accurately-updating-voltage-optional">Accurately Updating Voltage (Optional)</h2>
+<p class="sd-card-text">If the refractory period ends in the middle of a timestep, our voltage should only be updated for the part of the timestep that was <em>not</em> in the refractory period. So we need to update our <code class="docutils literal notranslate"><span class="pre">step()</span></code> function again so that we take this into account.  This means we can no longer use <code class="docutils literal notranslate"><span class="pre">t_step</span></code> as the change in time (since the actual time where <code class="docutils literal notranslate"><span class="pre">I</span></code> was applied might be smaller).</p>
+<p class="sd-card-text">Instead, we’re going to create a variable <code class="docutils literal notranslate"><span class="pre">delta_t</span></code> that represents the <strong>actual</strong> amount of time that our neuron’s value updated. If <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;</span> <span class="pre">self.refractory_time</span> <span class="pre">&lt;</span> <span class="pre">t_step</span></code>, we can assign <code class="docutils literal notranslate"><span class="pre">delta_t</span></code> to <code class="docutils literal notranslate"><span class="pre">t_step</span> <span class="pre">-</span> <span class="pre">self.refractory_time</span></code> to represent the actual amount of time that <code class="docutils literal notranslate"><span class="pre">I</span></code> was applied for:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="c1"># How much time passed where we can actually accept input?</span>
+</pre></div>
+</div>
+<p class="sd-card-text">However, if <code class="docutils literal notranslate"><span class="pre">this.refractory_time</span> <span class="pre">&gt;</span> <span class="pre">t_step</span></code> then <code class="docutils literal notranslate"><span class="pre">delta_t</span></code> would be negative. We don’t want this so we add:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">delta_t</span> <span class="o">=</span>  <span class="mi">0</span>       <span class="c1"># Make sure it&#39;s not negative</span>
+</pre></div>
+</div>
+<p class="sd-card-text">The way that we defined <code class="docutils literal notranslate"><span class="pre">self.refractory_time</span></code>, it can be negative when our neuron finishes its refractory period. In that case, we want <code class="docutils literal notranslate"><span class="pre">delta_t</span> <span class="pre">=</span> <span class="pre">t_step</span></code>. If <code class="docutils literal notranslate"><span class="pre">self.refractory_time</span></code> is negative then we would end up with <code class="docutils literal notranslate"><span class="pre">delta_t</span> <span class="pre">&gt;</span> <span class="pre">t_step</span></code> so we can add:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">delta_t</span> <span class="o">&gt;</span> <span class="n">t_step</span><span class="p">:</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span>   <span class="c1"># Make sure it&#39;s not greater than our time step</span>
+</pre></div>
+</div>
+<p class="sd-card-text">Then, we need to replace our use of <code class="docutils literal notranslate"><span class="pre">t_step</span></code> in our equations to instead use <code class="docutils literal notranslate"><span class="pre">delta_t</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="c1"># CHANGED: Note that we use delta_t rather than t_step</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FirstOrderLIF2</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="c1"># vvv CHANGED vvv</span>
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="c1"># How much time passed where we can actually accept input?</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">delta_t</span> <span class="o">=</span>  <span class="mi">0</span>       <span class="c1"># Make sure it&#39;s not negative</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&gt;</span> <span class="n">t_step</span><span class="p">:</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span>   <span class="c1"># Make sure it&#39;s not greater than our time step</span>
+        <span class="c1"># ^^^ CHANGED ^^^</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="c1"># CHANGED: Note that we use delta_t rather than t_step</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>      <span class="c1"># Voltage is above the threshold</span>
+            <span class="n">spike_time</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">t_step</span> <span class="o">*</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">spike_time</span> <span class="c1"># Start refractory countdown</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>                         <span class="c1"># Fire</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                                       <span class="c1"># Reset potential</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>          <span class="c1"># Don&#39;t fire</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</details><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">3. Analytically Modeling <span class="math notranslate nohighlight">\(v(t)\)</span></span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h2 class="rubric" id="analytically-modeling-v-t">Analytically Modeling <span class="math notranslate nohighlight">\(v(t)\)</span></h2>
+<p class="sd-card-text">Recall that for LIF neurons, the rate of change of the potential (<span class="math notranslate nohighlight">\(v'(t)\)</span>) is <a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html#equation-eq-dvdt">(1)</a>:</p>
+<div class="math notranslate nohighlight">
+\[v'(t) = \frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t)\]</div>
+<p class="sd-card-text">We need to break down our simulation into discrete time steps (of size <span class="math notranslate nohighlight">\(T_{step}\)</span>) and we <em>estimated</em> the value of <span class="math notranslate nohighlight">\(v[t]\)</span> as <a class="reference internal" href="04%20-%20First%20Order%20LI.html#equation-eq-vdiscrete">(3)</a>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+v[0] &amp;= v_{init} \\
+v[t] &amp;= v[t-1] (1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}I[t]
+\end{align}
+\end{split}\]</div>
+<p class="sd-card-text">However, a <strong>better</strong> estimate of this would be to estimate <span class="math notranslate nohighlight">\(v[t]\)</span> as:</p>
+<div class="math notranslate nohighlight">
+\[v[t] = I[t] + e^{-\frac{T_{step}}{\tau_{rc}}} (v[t-1] - I[t])\]</div>
+<p class="sd-card-text">If we assume that <span class="math notranslate nohighlight">\(I(t)\)</span> is constant for time step <span class="math notranslate nohighlight">\(t\)</span> (so we’ll rename it <span class="math notranslate nohighlight">\(I\)</span>) (which we’ve pretty much already been assuming), we can get a better estimate analytically.</p>
+<h3 class="rubric" id="exponential-decay">Exponential Decay</h3>
+<p class="sd-card-text">When we have a function whose rate of change is proportional to its value (as <span class="math notranslate nohighlight">\(v(t)\)</span> is), we call it an <em>exponential</em> function. For example, <span class="math notranslate nohighlight">\(e^x\)</span> is an exponential function because its derivative is itself: <span class="math notranslate nohighlight">\(\frac{de^x}{dx} = e^x\)</span>. In this case, <span class="math notranslate nohighlight">\(v(t)\)</span> <em>decays</em> exponentially (as opposed to growing exponentially), which is the case when <span class="math notranslate nohighlight">\(x &lt; 0\)</span>.</p>
+<p class="sd-card-text">So generally, whenever we have a rate of change of something (in this case, <span class="math notranslate nohighlight">\(v'(t)\)</span>) that is proportional to the thing itself (in this case, <span class="math notranslate nohighlight">\(v(t)\)</span>), there’s a good chance that the solution involves either <span class="math notranslate nohighlight">\(e^{...}\)</span> or <span class="math notranslate nohighlight">\(sin(...)\)</span>, whose derivatives are proportional to themselves (and are related by Euler’s formula). Coming back to our function, one definition of <span class="math notranslate nohighlight">\(v(t)\)</span> that satisfies our constraints is:</p>
+<div class="math notranslate nohighlight">
+\[v(t) = I(1 - e^{-\frac{1}{\tau_{rc}}t})\]</div>
+<p class="sd-card-text">To check that this satisfies our definition of <span class="math notranslate nohighlight">\(v'(t)\)</span>, we can take the derivative:</p>
+<div class="math notranslate nohighlight">
+\[\frac{dv(t)}{dt} = \frac{1}{\tau_{rc}}e^{-\frac{1}{\tau_{rc}}t}I\]</div>
+<p class="sd-card-text">and we see that it satisfies our definition of <span class="math notranslate nohighlight">\(v'(t)\)</span>. We can add <span class="math notranslate nohighlight">\(0\)</span> as <span class="math notranslate nohighlight">\(\frac{1}{\tau_{rc}}I - \frac{1}{\tau_{rc}}I\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\frac{dv(t)}{dt} = \frac{1}{\tau_{rc}}e^{-\frac{1}{\tau_{rc}}t}I + \frac{1}{\tau_{rc}}I - \frac{1}{\tau_{rc}}I\]</div>
+<p class="sd-card-text">and redistribute the terms:</p>
+<div class="math notranslate nohighlight">
+\[\frac{dv(t)}{dt} = \frac{1}{\tau_{rc}}I - \frac{1}{\tau_{rc}}I(1 - e^{-\frac{1}{\tau_{rc}}t})\]</div>
+<p class="sd-card-text">and plug in our value of <span class="math notranslate nohighlight">\(v(t)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[\frac{dv(t)}{dt} = \frac{1}{\tau_{rc}}I - \frac{1}{\tau_{rc}}v(t)\]</div>
+<p class="sd-card-text">This matches our definition of <span class="math notranslate nohighlight">\(v(t)\)</span>.</p>
+<p class="sd-card-text">Now, rather than using a first-order Euler approximation, we can analytically compute an exact solution for <span class="math notranslate nohighlight">\(v(t + \Delta{}t)\)</span> relative to <span class="math notranslate nohighlight">\(v(t)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) = I(1-e^{-\frac{1}{\tau_{rc}}(t + \Delta{}t)})\]</div>
+<p class="sd-card-text">expanding this out:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) = I-Ie^{-\frac{1}{\tau_{rc}}(t + \Delta{}t)}\]</div>
+<p class="sd-card-text">and adding <span class="math notranslate nohighlight">\(0\)</span> in the form of <span class="math notranslate nohighlight">\(Ie^{-\frac{1}{\tau_{rc}}\Delta{}t} - Ie^{-\frac{1}{\tau_{rc}}\Delta{}t}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) = I-Ie^{-\frac{1}{\tau_{rc}}(t + \Delta{}t)} + Ie^{-\frac{1}{\tau_{rc}}\Delta{}t} - Ie^{-\frac{1}{\tau_{rc}}\Delta{}t}\]</div>
+<p class="sd-card-text">and re-writing <span class="math notranslate nohighlight">\(e^{-\frac{1}{\tau_{rc}}(t + \Delta{}t)}\)</span> as <span class="math notranslate nohighlight">\(e^{-\frac{1}{\tau_{rc}}t}e^{-\frac{1}{\tau_{rc}}\Delta{}t}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) = I-Ie^{-\frac{1}{\tau_{rc}}t}e^{-\frac{1}{\tau_{rc}}\Delta{}t} + Ie^{-\frac{1}{\tau_{rc}}\Delta{}t} - Ie^{-\frac{1}{\tau_{rc}}\Delta{}t}\]</div>
+<p class="sd-card-text">re-arranging:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) = I + Ie^{-\frac{1}{\tau_{rc}}t} -Ie^{-\frac{1}{\tau_{rc}}t}e^{-\frac{1}{\tau_{rc}}\Delta{}t} - Ie^{-\frac{1}{\tau_{rc}}\Delta{}t}\]</div>
+<p class="sd-card-text">grouping:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) = I + e^{-\frac{1}{\tau_{rc}}\Delta{}t}(I(1 - e^{-\frac{1}{\tau_{rc}}t}) - I)\]</div>
+<p class="sd-card-text">but since <span class="math notranslate nohighlight">\(v(t) = I(1 - e^{-\frac{1}{\tau_{rc}}t})\)</span>, we can substitute:</p>
+<div class="math notranslate nohighlight">
+\[v(t + \Delta{}t) = I + e^{-\frac{1}{\tau_{rc}}\Delta{}t}(v(t) - I)\]</div>
+<p class="sd-card-text">…and now we have a <em>precise</em> relationship between <span class="math notranslate nohighlight">\(v(t + \Delta{}t)\)</span> and <span class="math notranslate nohighlight">\(v(t)\)</span>.</p>
+<p class="sd-card-text">We can use this in our discrete simulation, where we use the more precise:</p>
+<div class="math notranslate nohighlight">
+\[v[t] =  I[t] + e^{-\frac{\Delta{}t}{\tau_{rc}}}(v[t-1] - I[t])\]</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">class</span> <span class="nc">AnalyticalLIF</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="c1"># How much time passed where we can actually accept input?</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">delta_t</span> <span class="o">=</span>  <span class="mi">0</span>       <span class="c1"># Make sure it&#39;s not negative</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&gt;</span> <span class="n">t_step</span><span class="p">:</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span>   <span class="c1"># Make sure it&#39;s not greater than our time step</span>
+
+        <span class="c1"># vvv CHANGED vvv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span>
+        <span class="c1"># ^^^ CHANGED ^^^</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>      <span class="c1"># Voltage is above the threshold</span>
+            <span class="c1"># vvv CHANGED vvv</span>
+            <span class="n">spike_time</span> <span class="o">=</span> <span class="n">delta_t</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="n">I</span><span class="p">))</span>
+            <span class="c1"># ^^^ CHANGED ^^^</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">spike_time</span> <span class="c1"># Start refractory countdown</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>                         <span class="c1"># Fire</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                                       <span class="c1"># Reset potential</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>          <span class="c1"># Don&#39;t fire</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+</pre></div>
+</div>
+<h3 class="rubric" id="spiking-intercept">Spiking Intercept</h3>
+<p class="sd-card-text">Per concern 1, we want to have an estimate of when our potential crossed the firing threshold (when <span class="math notranslate nohighlight">\(v(t) \geq v_{th}\)</span>) in order to more accurately compute the refractory time.</p>
+<p class="sd-card-text">Now, we can obtain a more precise spike time than before. If we do the math, we get:</p>
+<div class="math notranslate nohighlight">
+\[v(t_{th}) = v_{th} = I + e^{-\frac{t_{th}}{\tau_{rc}}}(v(t - \Delta{}t) - I)\]</div>
+<p class="sd-card-text">We can use this to find <span class="math notranslate nohighlight">\(t_{th}\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[t_{th} = \tau_{rc}\log{\frac{v(t-\Delta{}t)-I}{v_{th}-I}}\]</div>
+<p class="sd-card-text">doing more math and putting it in terms of <span class="math notranslate nohighlight">\(v(t)\)</span> rather than <span class="math notranslate nohighlight">\(v(t-\Delta{}t)\)</span>, we get:</p>
+<div class="math notranslate nohighlight">
+\[t_{th} = \Delta{}t + \tau_{rc}\log{\frac{v(t)-I}{v_{th}-I}}\]</div>
+<p class="sd-card-text">In our code, we can then write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spike_time</span> <span class="o">=</span> <span class="n">delta_t</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="n">I</span><span class="p">))</span>
+</pre></div>
+</div>
+<p class="sd-card-text">So our final code is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="k">class</span> <span class="nc">AnalyticalLIF</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="c1"># How much time passed where we can actually accept input?</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">delta_t</span> <span class="o">=</span>  <span class="mi">0</span>       <span class="c1"># Make sure it&#39;s not negative</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&gt;</span> <span class="n">t_step</span><span class="p">:</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span>   <span class="c1"># Make sure it&#39;s not greater than our time step</span>
+
+        <span class="c1"># vvv CHANGED vvv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span>
+        <span class="c1"># ^^^ CHANGED ^^^</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>      <span class="c1"># Voltage is above the threshold</span>
+            <span class="c1"># vvv CHANGED vvv</span>
+            <span class="n">spike_time</span> <span class="o">=</span> <span class="n">delta_t</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="n">I</span><span class="p">))</span>
+            <span class="c1"># ^^^ CHANGED ^^^</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">spike_time</span> <span class="c1"># Start refractory countdown</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>                         <span class="c1"># Fire</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                                       <span class="c1"># Reset potential</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>          <span class="c1"># Don&#39;t fire</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</details><p>After these improvements, we end up with the following code:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">AnalyticalLIF</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="c1"># How much time passed where we can actually accept input?</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">delta_t</span> <span class="o">=</span>  <span class="mi">0</span>       <span class="c1"># Make sure it&#39;s not negative</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&gt;</span> <span class="n">t_step</span><span class="p">:</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span>   <span class="c1"># Make sure it&#39;s not greater than our time step</span>
+        <span class="c1"># ^---CHANGED to get a more accurate estimate how how much time was not part of the refractory time</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="c1"># &lt;-CHANGED to more accurately update the voltage</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>      <span class="c1"># Voltage is above the threshold</span>
+            <span class="n">spike_time</span> <span class="o">=</span> <span class="n">delta_t</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="n">I</span><span class="p">))</span> <span class="c1">#&lt;-CHANGED to get a more precise spike time</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">spike_time</span> <span class="c1"># Start refractory countdown</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>                         <span class="c1"># Fire</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                                       <span class="c1"># Reset potential</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>          <span class="c1"># Don&#39;t fire</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="measuring-the-benefit">
+<h2>Measuring the Benefit<a class="headerlink" href="#measuring-the-benefit" title="Link to this heading">#</a></h2>
+<p>So far, we’ve made some changes to get a more accurate model…but is there really a benefit? In short, that depends. Let’s measure. We’re going to take a few random time step options (defined using <code class="docutils literal notranslate"><span class="pre">TIME_STEP_SIZES</span></code> below):</p>
+<p>…for each of these time steps, we are going to evaluate a rough idea of “accuracy” by measuring the number of times our neuron spikes given a few inputs. We will measure “ground truth” using a very small time step size, count how many times our neuron fires in the “ground truth” case, and compare that to how many times it fires for larger time steps. We will measure the error as the difference in the number of spikes (divided by the total number of spikes to scale it accurately)</p>
+<p>We will do this for:</p>
+<ul class="simple">
+<li><p>The first order approximation (in orange below), which was our original code</p></li>
+<li><p>The first order approximation (in green below) that allows for refractory times that are fractions of the time step</p></li>
+<li><p>Our analytical solution (in blue below), which is the <code class="docutils literal notranslate"><span class="pre">AnalyticalLIF</span></code> class defined above</p></li>
+</ul>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">FirstOrderLIF</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># If we aren&#39;t in our refractory period, update the voltage</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>      <span class="c1"># Voltage is above the threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="c1"># Start refractory countdown</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>            <span class="c1"># Fire</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                          <span class="c1"># Reset potential</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>          <span class="c1"># Don&#39;t fire</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+
+<span class="k">class</span> <span class="nc">FirstOrderLIF2</span><span class="p">:</span> <span class="c1"># First Order Leaky Integrate and Fire</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_init</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span> <span class="c1"># Default values for tau_rc and v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span>  <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Set instance variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span>       <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>    <span class="o">=</span> <span class="n">v_th</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span> <span class="c1"># Advance one time step (input I and time step size t_step)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">t_step</span> <span class="c1"># Subtract the amount of time that passed from our refractory time</span>
+
+        <span class="c1"># vvv CHANGED vvv</span>
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="c1"># How much time passed where we can actually accept input?</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>      <span class="n">delta_t</span> <span class="o">=</span>  <span class="mi">0</span>       <span class="c1"># Make sure it&#39;s not negative</span>
+        <span class="k">if</span> <span class="n">delta_t</span> <span class="o">&gt;</span> <span class="n">t_step</span><span class="p">:</span> <span class="n">delta_t</span> <span class="o">=</span> <span class="n">t_step</span>   <span class="c1"># Make sure it&#39;s not greater than our time step</span>
+        <span class="c1"># ^^^ CHANGED ^^^</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span> <span class="o">+</span> <span class="n">I</span> <span class="o">*</span> <span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="c1"># CHANGED: Note that we use delta_t rather than t_step</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">:</span>      <span class="c1"># Voltage is above the threshold</span>
+            <span class="n">spike_time</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="n">t_step</span> <span class="o">*</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">I</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">spike_time</span> <span class="c1"># Start refractory countdown</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">t_step</span>                         <span class="c1"># Fire</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span>                                       <span class="c1"># Reset potential</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>          <span class="c1"># Don&#39;t fire</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+
+<span class="n">NUM_SECONDS</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">TIME_STEP_SIZES</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">currSize</span> <span class="o">=</span> <span class="mf">0.0001</span>
+<span class="k">while</span> <span class="n">currSize</span> <span class="o">&lt;</span> <span class="mf">0.002</span><span class="p">:</span>
+    <span class="n">TIME_STEP_SIZES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">currSize</span><span class="p">)</span>
+    <span class="n">currSize</span> <span class="o">*=</span> <span class="mf">1.2</span>
+
+<span class="k">def</span> <span class="nf">getSpikeCount</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">numSeconds</span><span class="p">,</span> <span class="n">timeStepSize</span><span class="p">):</span>
+    <span class="n">numSteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numSeconds</span> <span class="o">/</span> <span class="n">timeStepSize</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numSteps</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">I</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">timeStepSize</span><span class="p">),</span> <span class="n">timeStepSize</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">output</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">count</span>
+
+<span class="n">neurons</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;analytical&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">AnalyticalLIF</span><span class="p">(),</span>
+    <span class="s1">&#39;firstOrder&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">FirstOrderLIF</span><span class="p">(),</span>
+    <span class="s1">&#39;firstOrderFractional&#39;</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">FirstOrderLIF2</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="n">avgErrors</span> <span class="o">=</span> <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">neurons</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">}</span>
+<span class="n">errors</span> <span class="o">=</span> <span class="p">{</span> <span class="n">k</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">neurons</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="p">}</span>
+
+<span class="k">for</span> <span class="n">timeStepSize</span> <span class="ow">in</span> <span class="n">TIME_STEP_SIZES</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+        <span class="n">errors</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">timeStepSize</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">1.2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">]:</span>
+    <span class="n">I</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">i</span>
+    <span class="n">groundTruthCount</span> <span class="o">=</span> <span class="n">getSpikeCount</span><span class="p">(</span><span class="n">AnalyticalLIF</span><span class="p">(),</span> <span class="n">I</span><span class="p">,</span> <span class="n">NUM_SECONDS</span><span class="p">,</span> <span class="mf">1e-6</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">neuronType</span> <span class="ow">in</span> <span class="n">neurons</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">timeStepSize</span> <span class="ow">in</span> <span class="n">TIME_STEP_SIZES</span><span class="p">:</span>
+            <span class="n">neuron</span> <span class="o">=</span> <span class="n">neurons</span><span class="p">[</span><span class="n">neuronType</span><span class="p">]()</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">groundTruthCount</span> <span class="o">-</span> <span class="n">getSpikeCount</span><span class="p">(</span><span class="n">neuron</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">NUM_SECONDS</span><span class="p">,</span> <span class="n">timeStepSize</span><span class="p">))</span>
+            <span class="n">errors</span><span class="p">[</span><span class="n">neuronType</span><span class="p">][</span><span class="n">timeStepSize</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            
+        
+<span class="k">for</span> <span class="n">neuronType</span> <span class="ow">in</span> <span class="n">neurons</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">timeStepSize</span> <span class="ow">in</span> <span class="n">TIME_STEP_SIZES</span><span class="p">:</span>
+        <span class="n">avgErrors</span><span class="p">[</span><span class="n">neuronType</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">errors</span><span class="p">[</span><span class="n">neuronType</span><span class="p">][</span><span class="n">timeStepSize</span><span class="p">]))</span>
+
+<span class="c1"># Plotting the error vs time step size</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">neuronType</span> <span class="ow">in</span> <span class="n">neurons</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">TIME_STEP_SIZES</span><span class="p">,</span> <span class="n">avgErrors</span><span class="p">[</span><span class="n">neuronType</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">neuronType</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time Step Size&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Average Error&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Error vs Time Step Size&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/0db92fcb3e660083a4a9b1dbdcdb987ea4d703b06780ccae6b6f3af984a3e7a0.png" src="../_images/0db92fcb3e660083a4a9b1dbdcdb987ea4d703b06780ccae6b6f3af984a3e7a0.png" />
+</div>
+</div>
+<p>In the graph below, a <em>lower</em> error rate is better.</p>
+<p>As we can see, our analytical solution (blue line) performs better than our original solution (orange line). This tells us that with the analytical model of LIFs, we might be able to use slightly larger time steps while maintaining accuracy.</p>
+</section>
+<section id="improving-accuracy-for-synapses">
+<h2>Improving Accuracy for Synapses<a class="headerlink" href="#improving-accuracy-for-synapses" title="Link to this heading">#</a></h2>
+<p>We can also improve the accuracy of the synapse model we’ve been using, similar to how we did for LIFs.</p>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">Analytical Model for Synapses</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h2 class="rubric" id="optional-analytical-model-for-synapses">(Optional) Analytical Model for Synapses</h2>
+<p class="sd-card-text">As was the case for LIFs, our update function <span class="math notranslate nohighlight">\(g[t+1] = g[t] (1 - \frac{T_{step}}{\tau_s}) + \frac{T_{step}}{\tau_s}\delta_s[t]\)</span> is an <em>estimate</em>. We can get more precise in our estimate if we do the same analytical modeling that we did for our LIF neurons. Rather than repeating the analysis here, we will write our solution as:</p>
+<div class="math notranslate nohighlight">
+\[g[t + 1] = \delta_s[t] + e^{-\frac{T_{step}}{\tau_{s}}}(g[t] - \delta_s[t])\]</div>
+<p class="sd-card-text">and we could update our <code class="docutils literal notranslate"><span class="pre">step()</span></code> function accordingly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="n">tau_s</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span>
+</pre></div>
+</div>
+<details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">(Double Optional) Another way to think about this using State Space Modeling</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h3 class="rubric" id="optional-2-state-space-modeling">(Optional * 2) State Space Modeling</h3>
+<p class="sd-card-text">We were able to compute our synapse’s response analytically but this might be more difficult with more complex synapse models. For those, it might be easuer to model it using a state-space representation.</p>
+<h4 class="rubric" id="linear-time-invariance-lti">Linear Time Invariance (LTI)</h4>
+<p class="sd-card-text">If we had a more complex synapse model, analysis does not become too much more difficult as long as we assume our synapse model <span class="math notranslate nohighlight">\(g(t)\)</span> is a <a class="reference external" href="https://en.wikipedia.org/wiki/Linear_time-invariant_system">linear time-invariant (LTI) system</a>. This means that:</p>
+<ol class="arabic simple">
+<li><p class="sd-card-text"><strong>Time invariance</strong>: If we shift our spike time by any amount of time <span class="math notranslate nohighlight">\(T\)</span>, the synapse potential would be exactly the same but also shifted by <span class="math notranslate nohighlight">\(T\)</span>. Mathematically, this means that if our input signal is <span class="math notranslate nohighlight">\(x(t)\)</span> then if <span class="math notranslate nohighlight">\(x(t)\)</span> produces response <span class="math notranslate nohighlight">\(g(t)\)</span> then <span class="math notranslate nohighlight">\(x(t + T)\)</span> produces response <span class="math notranslate nohighlight">\(g(t + T)\)</span>.</p></li>
+<li><p class="sd-card-text"><strong>Linearity</strong>: Our response scales linearly with the input. What this means is that if we have multiple inputs <span class="math notranslate nohighlight">\(x_1(t)\)</span> and <span class="math notranslate nohighlight">\(x_2(t)\)</span> with respective responses <span class="math notranslate nohighlight">\(g_1(t)\)</span> and <span class="math notranslate nohighlight">\(g_2(t)\)</span>, then if we add the inputs <span class="math notranslate nohighlight">\(x(t) = x_1(t) + x_2(t)\)</span> then the resulting response is the sum of the outputs: <span class="math notranslate nohighlight">\(g(t) = g_1(t) + g_2(t)\)</span>.</p></li>
+</ol>
+<p class="sd-card-text">With LTI systems, we can compute the output of any arbitrary input signal <em>just by knowing its “impulse response” function</em> <span class="math notranslate nohighlight">\(h(t)\)</span>. The <strong>impulse response</strong> function <span class="math notranslate nohighlight">\(h(t)\)</span> represents the potential energy over time if our neuron fired <em>exactly once</em> at <span class="math notranslate nohighlight">\(t=0\)</span>. It should be <span class="math notranslate nohighlight">\(0\)</span> for <span class="math notranslate nohighlight">\(t &lt;0\)</span> (if it hasn’t fired, there is no energy) and can be any shape for <span class="math notranslate nohighlight">\(t \ge 0\)</span>. We call <span class="math notranslate nohighlight">\(h(t)\)</span> our <strong>post-synaptic potential</strong> function.</p>
+<p class="sd-card-text">In our case, we are using:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+h(t) =
+\begin{cases}
+  0, &amp; \text{if } t &lt; 0\\
+  \frac{1}{\tau_s}e^{-\frac{t}{\tau_{s}}}, &amp; \text{if } t \geq 0
+\end{cases}
+\end{split}\]</div>
+<p class="sd-card-text">With our impulse response <span class="math notranslate nohighlight">\(h(t)\)</span> and any input signal <span class="math notranslate nohighlight">\(u(t)\)</span> we can compute our synapse’s output (what we called <span class="math notranslate nohighlight">\(g(t)\)</span>) with a <a class="reference external" href="https://en.wikipedia.org/wiki/Convolution"><strong>convolution</strong></a>, represented as <span class="math notranslate nohighlight">\(u(t) \ast h(t)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[g(t) = u(t) \ast h(t) = (u \ast h)(t) = \int_{-\infty}^{\infty} u(\tau)h(t - \tau),d\tau\]</div>
+<h4 class="rubric" id="state-space-computation">State Space Computation</h4>
+<p class="sd-card-text">In systems analysis, it is common to analyze system dynamics by translating it to a “state space” representation that summarizes the dynamics and output given an input:</p>
+<div class="math notranslate nohighlight">
+\[x'(t) = Ax(t) + Bu(t)\]</div>
+<div class="math notranslate nohighlight">
+\[g(t) = Cx(t) + Du(t)\]</div>
+<p class="sd-card-text">Where <span class="math notranslate nohighlight">\(x(t)\)</span> represents the state of the system, <span class="math notranslate nohighlight">\(x'(t)\)</span> represents the rate of change of <span class="math notranslate nohighlight">\(x(t)\)</span>, <span class="math notranslate nohighlight">\(u(t)\)</span> represents the input, and <span class="math notranslate nohighlight">\(g(t)\)</span> represents the output.</p>
+<p class="sd-card-text">Since we are assuming that we are working in an LTI, the output of our neuron, <span class="math notranslate nohighlight">\(y(t)\)</span> is the input, <span class="math notranslate nohighlight">\(u(t)\)</span> convolved with the impulse response function <span class="math notranslate nohighlight">\(h(t)\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[g(t) = (u \ast h)(t)\]</div>
+<p class="sd-card-text">We can use the <a class="reference external" href="https://en.wikipedia.org/wiki/Laplace_transform">Laplace transform</a> to help transform our functions into the frequency domain and simply do multiplication:</p>
+<div class="math notranslate nohighlight">
+\[G(s) = U(s)H(s)\]</div>
+<p class="sd-card-text">We can first take the Laplace transform of <span class="math notranslate nohighlight">\(h(t)\)</span> to transfer it into frequency space:</p>
+<div class="math notranslate nohighlight">
+\[ \mathscr{L}\{h(t)\} = H(s) = \frac{G(s)}{U(s)} = \int_{t=0}^{\infty}h(t)e^{-st}dt \]</div>
+<p class="sd-card-text">So plugging in <span class="math notranslate nohighlight">\(h(t) = \frac{1}{\tau_s}e^{-\frac{t}{\tau_s}}\)</span>, we get</p>
+<div class="math notranslate nohighlight">
+\[ H(s) = \frac{G(s)}{U(s)} = \int_{t=0}^{\infty}\frac{1}{\tau_s}e^{-\frac{t}{\tau_s}}e^{-st}dt \]</div>
+<p class="sd-card-text">If we solve this, we get:</p>
+<div class="math notranslate nohighlight">
+\[ H(s) = \frac{1}{s\tau_s + 1} = \frac{G(s)}{U(s)} \]</div>
+<p class="sd-card-text">In our case, there is effectively no difference between <span class="math notranslate nohighlight">\(x(t)\)</span> and <span class="math notranslate nohighlight">\(g(t)\)</span>, as our “state”—the potential—is also the output. So let’s set <span class="math notranslate nohighlight">\(x(t) = g(t)\)</span>. Recalling our state space equations, we are saying that <span class="math notranslate nohighlight">\(C = 1\)</span> and <span class="math notranslate nohighlight">\(D = 0\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[x'(t) = Ax(t) + Bu(t)\]</div>
+<div class="math notranslate nohighlight">
+\[g(t) = Cx(t) + Du(t) = x(t)\]</div>
+<p class="sd-card-text">then, substituting <span class="math notranslate nohighlight">\(X(s)\)</span> for <span class="math notranslate nohighlight">\(G(s)\)</span> in the above equation, we get:</p>
+<div class="math notranslate nohighlight">
+\[ H(s) = \frac{1}{s\tau_s + 1} = \frac{X(s)}{U(s)} \]</div>
+<div class="math notranslate nohighlight">
+\[ U(s) = s\tau_sX(s) + X(s) \]</div>
+<div class="math notranslate nohighlight">
+\[ sX(s) = -\frac{1}{\tau_s}X(s) + \frac{1}{\tau_s}U(s) \]</div>
+<p class="sd-card-text">Taking the inverse Laplace transform (<span class="math notranslate nohighlight">\(\mathscr{L}^{-1}\)</span>), we get:</p>
+<div class="math notranslate nohighlight">
+\[ \mathscr{L}^{-1}\{sX(s)\} = \mathscr{L}^{-1}\{-\frac{1}{\tau_s}X(s) + \frac{1}{\tau_s}U(s)\} \]</div>
+<div class="math notranslate nohighlight">
+\[ x'(t) = -\frac{1}{\tau_s}x(t) + \frac{1}{\tau_s}u(t) \]</div>
+<p class="sd-card-text">So in other words, we have <span class="math notranslate nohighlight">\(A = -\frac{1}{\tau_s}\)</span>, <span class="math notranslate nohighlight">\(B = \frac{1}{\tau_s}\)</span>, <span class="math notranslate nohighlight">\(C = 1\)</span>, <span class="math notranslate nohighlight">\(D = 0\)</span></p>
+<h4 class="rubric" id="transforming-state-space-to-discrete-time">Transforming State Space to Discrete Time</h4>
+<p class="sd-card-text">However, our state space representation is not yet complete because it is for <strong>continuous time</strong> whereas we are working in discrete time. So we need to <a class="reference external" href="https://en.wikipedia.org/wiki/Discretization#Discretization_of_linear_state_space_models">discretize our state space model</a>. In other words, we need to find coefficients <span class="math notranslate nohighlight">\(A_d\)</span>, <span class="math notranslate nohighlight">\(B_d\)</span>, <span class="math notranslate nohighlight">\(C_d\)</span>, <span class="math notranslate nohighlight">\(D_d\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[ x[t+1] = A_dx[t] + B_du[t] \]</div>
+<div class="math notranslate nohighlight">
+\[ g[t] = C_dx[t] + D_du[t] \]</div>
+<p class="sd-card-text">We can find these based on our prior coefficients <span class="math notranslate nohighlight">\(A = -\frac{1}{\tau_s}\)</span>, <span class="math notranslate nohighlight">\(B = \frac{1}{\tau_s}\)</span>, <span class="math notranslate nohighlight">\(C = 1\)</span>, <span class="math notranslate nohighlight">\(D = 0\)</span>. Because the second equation is just extracting the relevant output (<span class="math notranslate nohighlight">\(y\)</span>) from our state (<span class="math notranslate nohighlight">\(x\)</span>). So <span class="math notranslate nohighlight">\(C_d = C = 1\)</span> and <span class="math notranslate nohighlight">\(D_d = D = 0\)</span>.</p>
+<p class="sd-card-text">Now, we need to find <span class="math notranslate nohighlight">\(A_d\)</span> and <span class="math notranslate nohighlight">\(B_d\)</span>. We will assume that each time step has size <span class="math notranslate nohighlight">\(T_{step}\)</span> and that within each time step, the input <span class="math notranslate nohighlight">\(u\)</span> is constant.</p>
+<p class="sd-card-text">We can use <a class="reference external" href="https://en.wikipedia.org/wiki/Discretization#Discretization_of_linear_state_space_models">a process for transforming the values for A, B, C, and D to discrete space</a> which would result in:</p>
+<div class="math notranslate nohighlight">
+\[A_d = e^{AT_{step}}\]</div>
+<div class="math notranslate nohighlight">
+\[A_d = e^{-\frac{T_{step}}{\tau_s}}\]</div>
+<p class="sd-card-text">and
+$<span class="math notranslate nohighlight">\(\newline{}B_d = A^{-1}(A_d - I)B\)</span><span class="math notranslate nohighlight">\(
+\)</span><span class="math notranslate nohighlight">\(B_d = -\tau_s(e^{-\frac{T_{step}}{\tau_s}}-1)\frac{1}{\tau_s}\)</span><span class="math notranslate nohighlight">\(
+\)</span><span class="math notranslate nohighlight">\(B_d = 1 - e^{-\frac{T_{step}}{\tau_s}}\)</span>$</p>
+<p class="sd-card-text">Noting that <span class="math notranslate nohighlight">\(g[t] = x[t]\)</span> and re-naming our input to be consistent <span class="math notranslate nohighlight">\(u[t] = \delta_s[t]\)</span> This gives us:</p>
+<div class="math notranslate nohighlight">
+\[ g[t+1] = A_dg[t] + B_d\delta_s[t] \]</div>
+<div class="math notranslate nohighlight">
+\[ g[t+1] = g[t]e^{-\frac{T_{step}}{\tau_s}} + (1 - e^{-\frac{T_{step}}{\tau_s}})\delta_s[t] \]</div>
+<div class="math notranslate nohighlight">
+\[ g[t+1] = \delta_s[t] + e^{-\frac{T_{step}}{\tau_s}}(g[t] - \delta_s[t]) \]</div>
+<p class="sd-card-text">And we can see that our space state representation yields the same result as our analytical solution.</p>
+</div>
+</details><p class="sd-card-text">Although our analytical solution is more accurate, there is a computational cost to performing <code class="docutils literal notranslate"><span class="pre">Math.exp</span></code> instead of simple addition and multiplication…however, we can actually address this by pre-computing the value <span class="math notranslate nohighlight">\(e^{-\frac{T_{step}}{\tau_{s}}}\)</span>, assigning it to a variable (let’s say <code class="docutils literal notranslate"><span class="pre">a</span></code>) and assigning:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span><span class="o">/</span><span class="n">tau_s</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="n">a</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</details><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">Synapse</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_s</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_s</span> <span class="o">=</span> <span class="n">tau_s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">I</span><span class="p">,</span> <span class="n">t_step</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t_step</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_s</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We see that if we increase our time step size (<span class="math notranslate nohighlight">\(T_{step}\)</span>), our analytical solution stays more faithful to the accurate solution (the dashed line below):</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">tstep</span> <span class="o">=</span> <span class="mf">0.008</span>
+
+
+<span class="n">minT</span><span class="p">,</span> <span class="n">maxT</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span>
+<span class="n">tau_s</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">gTruthTStep</span> <span class="o">=</span> <span class="mf">1e-3</span>
+
+<span class="n">gTruthData</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">gTruthG</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">minT</span><span class="p">,</span> <span class="n">maxT</span><span class="p">,</span> <span class="n">gTruthTStep</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">gTruthTStep</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">gTruthG</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gTruthG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gTruthTStep</span> <span class="o">/</span> <span class="n">tau_s</span><span class="p">)</span> <span class="o">*</span> <span class="n">gTruthG</span>
+    <span class="n">gTruthData</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">gTruthG</span><span class="p">))</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">firstOrderG</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">analyticalG</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">minT</span><span class="p">,</span> <span class="n">maxT</span><span class="p">,</span> <span class="n">tstep</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">tstep</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">analyticalG</span> <span class="o">=</span> <span class="n">firstOrderG</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">analyticalG</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">tstep</span> <span class="o">/</span> <span class="n">tau_s</span><span class="p">)</span> <span class="o">*</span> <span class="n">analyticalG</span>
+        <span class="n">firstOrderG</span> <span class="o">=</span> <span class="n">firstOrderG</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tstep</span> <span class="o">/</span> <span class="n">tau_s</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">firstOrderG</span><span class="p">,</span> <span class="n">analyticalG</span><span class="p">))</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">gTruthData</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gTruthData</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;First Order&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#999&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Analytical&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">gTruthData</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">gTruthData</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Ground Truth&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#555&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;t&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;g&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/2e90082b43864c4821c058c19d9671562ffd374ce21928092f7e28951bc750a6.png" src="../_images/2e90082b43864c4821c058c19d9671562ffd374ce21928092f7e28951bc750a6.png" />
+</div>
+</div>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>The Youtube channel 3Blue1Brown has a useful <a class="reference external" href="https://youtu.be/KuXjwB4LzSA">video describing convolutions</a></p></li>
+<li><p>The same channel has a useful <a class="reference external" href="https://youtu.be/spUNpyF58BY">introduction to the Fourier Transform</a> (which is a good starting point for understanding the Laplace transform)</p></li>
+<li><p>The use of state space modeling was inspired by <a class="reference external" href="https://github.com/nengo/nengo/blob/dc0419fbe571374d0a55a7f67309dfcb254a2e88/nengo/synapses.py">Nengo’s synapse implementation</a>, which uses state space modeling for synapses</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Parts of the LIF implementation were adapted from <a class="reference external" href="https://github.com/nengo/nengo/blob/dc0419fbe571374d0a55a7f67309dfcb254a2e88/nengo/neurons.py#L612-L685">Nengo’s LIF implementation</a></p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="11%20-%20Representing%202D%20Images.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Representing 2D Images</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="13%20-%20Neuron%20Collections.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Neuron Collections</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-benefit">Measuring the Benefit</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#improving-accuracy-for-synapses">Improving Accuracy for Synapses</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

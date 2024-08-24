@@ -1,0 +1,1085 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Adaptive LIF Neurons &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/15 - Adaptive LIF Neurons';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Learning through Spike-Timing Dependent Plasticity (STDP)" href="16%20-%20STDP.html" />
+    <link rel="prev" title="Weights and Connections" href="14%20-%20Weights%20and%20Connections.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html">Basic Neuron Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04%20-%20First%20Order%20LI.html">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="09%20-%20Collections%20of%20Neurons.html">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="12%20-%20Improving%20Accuracy.html">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16%20-%20STDP.html">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="17%20-%20Research%20Replication%201.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/15 - Adaptive LIF Neurons.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/15 - Adaptive LIF Neurons.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Adaptive LIF Neurons</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="adaptive-lif-neurons">
+<h1>Adaptive LIF Neurons<a class="headerlink" href="#adaptive-lif-neurons" title="Link to this heading">#</a></h1>
+<p>Thusfar, in modeling leaky integrate-and-fire (LIF) neurons, the only state variable that we have been modifying has been its current voltage/potential. However, in some applications it can also be useful to allow the <strong>threshold voltage</strong> (<span class="math notranslate nohighlight">\(v_{th}\)</span>) to vary. Specifically, when there is a spike, we can slightly increase <span class="math notranslate nohighlight">\(v_{th}\)</span> so that it is slightly more difficult to spike next time (i.e., it adapts to the level of input). We will call our new neuron model “Adaptive LIF” (ALIF).</p>
+<p>The ALIF can be useful in a variety of scenarios, including cases where we want neurons to “fine tune” their behave to adapt to input that might otherwise be too “intense” (and thus result in too high of a firing rate if neurons don’t adapt) and cases where we want to be sure that one neuron in a group doesn’t get “greedy” for inputs with which it is closely aligned.</p>
+<p>To implement ALIF neurons, we will create an additional state variable <span class="math notranslate nohighlight">\(w\)</span> to represent how much the threshold voltage (<span class="math notranslate nohighlight">\(v_{th}\)</span>) has increased (meaning that we will spike only when <span class="math notranslate nohighlight">\(v \geq v_{th} + w\)</span>). <span class="math notranslate nohighlight">\(w\)</span> will start as <span class="math notranslate nohighlight">\(0\)</span> and increase every time our neuron fires. We also create a variable <span class="math notranslate nohighlight">\(b\)</span> to represent the <strong>strength of adaption</strong>. When our ALIF spikes, we will increment <span class="math notranslate nohighlight">\(w\)</span> by <span class="math notranslate nohighlight">\(b\)</span>. We will also introduce a time constant <span class="math notranslate nohighlight">\(\tau_w\)</span> to specify how quickly <span class="math notranslate nohighlight">\(w\)</span> decays back to <span class="math notranslate nohighlight">\(0\)</span>.</p>
+<p>So now, rather than a static threshold <span class="math notranslate nohighlight">\(v_{th}\)</span>, we have a dynamic threshold, which we will call <span class="math notranslate nohighlight">\(\vartheta_{th}(t)\)</span>:</p>
+<p><span class="math notranslate nohighlight">\(\vartheta_{th}(t) = v_{th} + w(t)\)</span></p>
+<p>and our threshold changes over time by:</p>
+<p><span class="math notranslate nohighlight">\(\vartheta_{th}'(t) = -\frac{1}{\tau_w}w(t)\)</span></p>
+<p>if there is a spike at time <span class="math notranslate nohighlight">\(t\)</span> then <span class="math notranslate nohighlight">\(w(t)\)</span> increases by <span class="math notranslate nohighlight">\(b\)</span>.</p>
+<p>To implement ALIF neurons, let’s start by recalling the code that we had for LIF neurons:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LIF</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                 <span class="n">max_rates</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span> <span class="n">intercept_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">v_init</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="c1"># Set neuron parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>  <span class="c1"># Dimensionality of the input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Membrane time constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>  <span class="c1"># Refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_th</span>  <span class="c1"># Threshold voltage for spiking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span> <span class="o">=</span> <span class="n">t_step</span>  <span class="c1"># Time step for simulation</span>
+        
+        <span class="c1"># Initialize state variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_init</span>  <span class="c1"># Initial voltage of neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Time remaining in refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Output spikes</span>
+
+        <span class="c1"># Generate random max rates and intercepts within the given range</span>
+        <span class="n">max_rates_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">max_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_rates</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">intercepts_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">intercept_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intercept_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># Calculate gain and bias for each neuron</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">max_rates_tensor</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)))</span> <span class="o">/</span> <span class="p">(</span><span class="n">intercepts_tensor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">*</span> <span class="n">intercepts_tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize random encoders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Reset the state variables to initial conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span>  <span class="c1"># Time step</span>
+
+        <span class="c1"># Update refractory time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">dt</span>
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="c1"># ensure between 0 and dt</span>
+
+        <span class="c1"># Calculate input current</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">+</span> <span class="n">inputs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
+
+        <span class="c1"># Update membrane potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span>
+
+        <span class="c1"># Determine which neurons spike</span>
+        <span class="n">spike_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spike_mask</span> <span class="o">/</span> <span class="n">dt</span>  <span class="c1"># Record spikes in output</span>
+
+        <span class="c1"># Calculate the time of the spike</span>
+        <span class="n">t_spike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]))</span> <span class="o">+</span> <span class="n">dt</span>
+
+        <span class="c1"># Reset voltage of spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Set refractory time for spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">t_spike</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>  <span class="c1"># Return the output spikes</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>On top of this code, we will add:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">inh</span></code> to represent <span class="math notranslate nohighlight">\(w\)</span>, a variable that tracks how much the threshold voltage (<code class="docutils literal notranslate"><span class="pre">v_th</span></code>) has increased (meaning that <code class="docutils literal notranslate"><span class="pre">v</span></code> will need to exceed <code class="docutils literal notranslate"><span class="pre">this.v_th</span> <span class="pre">+</span> <span class="pre">this.inh</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tau_inh</span></code> to represent <span class="math notranslate nohighlight">\(\tau_w\)</span>, a time constant that tracks how <code class="docutils literal notranslate"><span class="pre">inh</span></code> should evolve over time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inc_inh</span></code> to represent <span class="math notranslate nohighlight">\(b\)</span>, which specifies how much to increase <code class="docutils literal notranslate"><span class="pre">inh</span></code> every time the neuron spikes</p></li>
+</ul>
+<p>We can update our constructor to include defaults for <code class="docutils literal notranslate"><span class="pre">tau_inh</span></code> and <code class="docutils literal notranslate"><span class="pre">inc_inh</span></code> (<code class="docutils literal notranslate"><span class="pre">0.05</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code> respectively):</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kr">constructor</span><span class="p">(...</span><span class="w"> </span><span class="nx">tau_inh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="nx">inc_inh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="p">...</span>
+</pre></div>
+</div>
+<p>and initializing our instance variables (with <code class="docutils literal notranslate"><span class="pre">this.inh</span></code> initialized to <code class="docutils literal notranslate"><span class="pre">0</span></code>):</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">tau_inh</span> <span class="o">=</span> <span class="n">tau_inh</span><span class="p">;</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">inc_inh</span> <span class="o">=</span> <span class="n">inc_inh</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Now, we want to update our firing condition (<code class="docutils literal notranslate"><span class="pre">if(this.v</span> <span class="pre">&gt;</span> <span class="pre">this.v_th)</span></code>) to add <code class="docutils literal notranslate"><span class="pre">this.inh</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inh</span><span class="p">:</span> <span class="c1">#...</span>
+</pre></div>
+</div>
+<p>and we want to update <code class="docutils literal notranslate"><span class="pre">self.inh</span></code> every timestep:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_step</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_inh</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>and if we fire:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">v</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inh</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inc_inh</span>
+        <span class="c1">#...</span>
+</pre></div>
+</div>
+<p>Below is the full code with these changes incorporated:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="k">class</span> <span class="nc">ALIF</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">v_th</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+                 <span class="n">max_rates</span><span class="o">=</span><span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span> <span class="n">intercept_range</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">t_step</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">v_init</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">tau_inh</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">inc_inh</span><span class="o">=</span><span class="mf">1.0</span> <span class="c1"># &lt;--- ADDED</span>
+                 <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="c1"># Set neuron parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">dim</span>  <span class="c1"># Dimensionality of the input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">=</span> <span class="n">tau_rc</span>  <span class="c1"># Membrane time constant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">=</span> <span class="n">tau_ref</span>  <span class="c1"># Refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_th</span>  <span class="c1"># Threshold voltage for spiking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span> <span class="o">=</span> <span class="n">t_step</span>  <span class="c1"># Time step for simulation</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># &lt;--- ADDED</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tau_inh</span> <span class="o">=</span> <span class="n">tau_inh</span>  <span class="c1"># &lt;--- ADDED</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inc_inh</span> <span class="o">=</span> <span class="n">inc_inh</span>  <span class="c1"># &lt;--- ADDED</span>
+        
+        <span class="c1"># Initialize state variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_init</span>  <span class="c1"># Initial voltage of neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Time remaining in refractory period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># Output spikes</span>
+
+        <span class="c1"># Generate random max rates and intercepts within the given range</span>
+        <span class="n">max_rates_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">max_rates</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_rates</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">intercepts_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">intercept_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intercept_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># Calculate gain and bias for each neuron</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="n">max_rates_tensor</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)))</span> <span class="o">/</span> <span class="p">(</span><span class="n">intercepts_tensor</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain</span> <span class="o">*</span> <span class="n">intercepts_tensor</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        
+        <span class="c1"># Initialize random encoders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoders</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Reset the state variables to initial conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># &lt;--- ADDED</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_step</span>  <span class="c1"># Time step</span>
+
+        <span class="c1"># Update refractory time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span> <span class="o">-=</span> <span class="n">dt</span>
+        <span class="n">delta_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dt</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span> <span class="c1"># ensure between 0 and dt</span>
+
+        <span class="c1"># Calculate input current</span>
+        <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias</span> <span class="o">+</span> <span class="n">inputs</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoders</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">gain</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Update membrane potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">=</span> <span class="n">I</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">-</span> <span class="n">I</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">delta_t</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span><span class="p">)</span>
+
+        <span class="c1"># Determine which neurons spike</span>
+        <span class="n">spike_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">v_th</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inh</span>  <span class="c1"># &lt;--- ADDED + self.inh</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">spike_mask</span> <span class="o">/</span> <span class="n">dt</span>  <span class="c1"># Record spikes in output</span>
+
+        <span class="c1"># Calculate the time of the spike</span>
+        <span class="n">t_spike</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_rc</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">v_th</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">-</span> <span class="n">I</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]))</span> <span class="o">+</span> <span class="n">dt</span>
+
+        <span class="c1"># Reset voltage of spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Set refractory time for spiking neurons</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refractory_time</span><span class="p">[</span><span class="n">spike_mask</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_ref</span> <span class="o">+</span> <span class="n">t_spike</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inh</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dt</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau_inh</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">inc_inh</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># &lt;--- ADDED</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output</span>  <span class="c1"># Return the output spikes</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<p>Let’s see what this looks like with <code class="docutils literal notranslate"><span class="pre">tau_inh</span> <span class="pre">=</span> <span class="pre">0.3</span></code> and <code class="docutils literal notranslate"><span class="pre">inc_inh</span> <span class="pre">=</span> <span class="pre">0.2</span></code> over a short time period (0.5 seconds). Note that we reduced the neuron’s refractory period so that the effect is more visible:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">t_step</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="n">neurons</span> <span class="o">=</span> <span class="n">ALIF</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">tau_inh</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">inc_inh</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">neurons</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span> <span class="p">;</span> <span class="n">neurons</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span> <span class="p">;</span> <span class="n">neurons</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]])</span> <span class="c1"># Remove the random gain, bias, and encoders</span>
+
+<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+<span class="n">inp</span> <span class="o">=</span> <span class="mf">1.3</span>
+
+<span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
+    <span class="n">neurons</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">neurons</span><span class="o">.</span><span class="n">voltage</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">neurons</span><span class="o">.</span><span class="n">v_th</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">neurons</span><span class="o">.</span><span class="n">inh</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">neurons</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="n">short_n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">/</span> <span class="n">t_step</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">[:</span><span class="n">short_n</span><span class="p">],</span> <span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">[:</span><span class="n">short_n</span><span class="p">]],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Voltage&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">[:</span><span class="n">short_n</span><span class="p">],</span> <span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">[:</span><span class="n">short_n</span><span class="p">]],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Threshold&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">[:</span><span class="n">short_n</span><span class="p">],</span> <span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">t_step</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">[:</span><span class="n">short_n</span><span class="p">]],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/56b5e1a017845a6a1f4aba50c996a240e823569691b6dc68ecf9a07229bf3b13.png" src="../_images/56b5e1a017845a6a1f4aba50c996a240e823569691b6dc68ecf9a07229bf3b13.png" />
+</div>
+</div>
+<p>Note that at first, the neuron spikes quickly but then spikes become more spaced out over time. The firing speed does become more regular over the long term, as our threshold and voltage “balance” out. Let’s look over a period of 5 seconds:</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Voltage&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Threshold&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">[</span><span class="n">o</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">t_step</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">],</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Output&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+<div class="cell_output docutils container">
+<img alt="../_images/3fde348da4a82c4d2632a33c9f377dfbb66ffe5f972aaaa13c8ec099507714fc.png" src="../_images/3fde348da4a82c4d2632a33c9f377dfbb66ffe5f972aaaa13c8ec099507714fc.png" />
+</div>
+</div>
+<p>Finally, we claimed that part of the motivation for using ALIFs is that their firing rate can be less sensitive to input variability…so let’s test this. Again, to make the difference more visible, we are going to tune a parameter of our ALIF neurons…we are going to increase <code class="docutils literal notranslate"><span class="pre">tau_inh</span></code> to <code class="docutils literal notranslate"><span class="pre">0.7</span></code> so that the additional inhibition stays for “longer” after it is increased.</p>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">plotFiringRates</span><span class="p">(</span><span class="n">tau_inh</span><span class="p">,</span> <span class="n">inc_inh</span><span class="p">):</span>
+    <span class="n">t_step</span> <span class="o">=</span> <span class="mf">0.001</span>
+    <span class="k">def</span> <span class="nf">getFiringRate</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">neuron</span><span class="p">,</span> <span class="n">runtime</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
+        <span class="n">num_spikes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
+            <span class="n">neuron</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">neuron</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">num_spikes</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">num_spikes</span> <span class="o">/</span> <span class="n">runtime</span>
+
+    <span class="n">alifs</span> <span class="o">=</span> <span class="n">ALIF</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">,</span> <span class="n">tau_inh</span><span class="o">=</span><span class="n">tau_inh</span><span class="p">,</span> <span class="n">inc_inh</span><span class="o">=</span><span class="n">inc_inh</span><span class="p">)</span>
+    <span class="n">lifs</span>  <span class="o">=</span>  <span class="n">LIF</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tau_ref</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span> <span class="n">tau_rc</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">t_step</span><span class="o">=</span><span class="n">t_step</span><span class="p">)</span>
+
+    <span class="n">alifs</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">lifs</span><span class="o">.</span><span class="n">bias</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span> <span class="p">;</span> <span class="n">alifs</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="n">lifs</span><span class="o">.</span><span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">])</span> <span class="p">;</span> <span class="n">alifs</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="n">lifs</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">]])</span> <span class="c1"># Remove the random gain, bias, and encoders</span>
+
+    <span class="n">rates</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+        <span class="n">alifFiringRate</span> <span class="o">=</span> <span class="n">getFiringRate</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">alifs</span><span class="p">)</span>
+        <span class="n">lifFiringRate</span>  <span class="o">=</span> <span class="n">getFiringRate</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">lifs</span><span class="p">)</span>
+
+        <span class="n">alifs</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span> <span class="p">;</span> <span class="n">lifs</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="n">rates</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">inp</span><span class="p">,</span> <span class="n">alifFiringRate</span><span class="p">,</span> <span class="n">lifFiringRate</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">],</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;ALIF&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">],</span> <span class="p">[</span><span class="n">r</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;LIF&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotFiringRates</span><span class="p">(</span><span class="n">tau_inh</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">inc_inh</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/e767780f6c1837131a8a08709c86dfc58ec1558fe1f7fce3b58ae68fb0b85636.png" src="../_images/e767780f6c1837131a8a08709c86dfc58ec1558fe1f7fce3b58ae68fb0b85636.png" />
+</div>
+</div>
+<!-- ```{editor} python
+:packages: matplotlib,numpy
+:run_on_load: true
+:max_height: 600px
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+tau_inh =  0.50 #<-SLIDE(0 to  1 by 0.001)
+inc_inc =  0.10 #<-SLIDE(0 to 20 by 0.01)
+
+class ALIF:
+    def __init__(self, n=1, dim=1, tau_rc=0.02, tau_ref=0.002, v_th=1, 
+                 max_rates=[200, 400], intercept_range=[-1, 1], t_step=0.001, v_init = 0,
+                 tau_inh=0.05, inc_inh=1.0 # <--- ADDED
+                 ):
+        self.n = n
+        # Set neuron parameters
+        self.dim = dim  # Dimensionality of the input
+        self.tau_rc = tau_rc  # Membrane time constant
+        self.tau_ref = tau_ref  # Refractory period
+        self.v_th = np.ones(n) * v_th  # Threshold voltage for spiking
+        self.t_step = t_step  # Time step for simulation
+
+        self.inh = np.zeros(n)  # <--- ADDED
+        self.tau_inh = tau_inh  # <--- ADDED
+        self.inc_inh = inc_inh  # <--- ADDED
+        
+        # Initialize state variables
+        self.voltage = np.ones(n) * v_init  # Initial voltage of neurons
+        self.refractory_time = np.zeros(n)  # Time remaining in refractory period
+        self.output = np.zeros(n)  # Output spikes
+
+        # Generate random max rates and intercepts within the given range
+        max_rates_tensor = np.random.uniform(max_rates[0], max_rates[1], n)
+        intercepts_tensor = np.random.uniform(intercept_range[0], intercept_range[1], n)
+
+        # Calculate gain and bias for each neuron
+        self.gain = self.v_th * (1 - 1 / (1 - np.exp((self.tau_ref - 1/max_rates_tensor) / self.tau_rc))) / (intercepts_tensor - 1)
+        self.bias = np.expand_dims(self.v_th - self.gain * intercepts_tensor, axis=1)
+        
+        # Initialize random encoders
+        self.encoders = np.random.randn(n, self.dim)
+        self.encoders /= np.linalg.norm(self.encoders, axis=1)[:, np.newaxis]
+
+    def reset(self):
+        # Reset the state variables to initial conditions
+        self.voltage = np.zeros(self.n)
+        self.refractory_time = np.zeros(self.n)
+        self.output = np.zeros(self.n)
+        self.inh = np.zeros(self.n)  # <--- ADDED
+
+    def step(self, inputs):
+        dt = self.t_step  # Time step
+
+        # Update refractory time
+        self.refractory_time -= dt
+        delta_t = np.clip(dt - self.refractory_time, 0, dt) # ensure between 0 and dt
+
+        # Calculate input current
+        I = np.sum(self.bias + inputs * self.encoders * self.gain[:, np.newaxis], axis=1)
+
+        # Update membrane potential
+        self.voltage = I + (self.voltage - I) * np.exp(-delta_t / self.tau_rc)
+
+        # Determine which neurons spike
+        spike_mask = self.voltage > self.v_th + self.inh  # <--- ADDED + self.inh
+        self.output[:] = spike_mask / dt  # Record spikes in output
+
+        # Calculate the time of the spike
+        t_spike = self.tau_rc * np.log((self.voltage[spike_mask] - I[spike_mask]) / (self.v_th[spike_mask] - I[spike_mask])) + dt
+
+        # Reset voltage of spiking neurons
+        self.voltage[spike_mask] = 0
+
+        # Set refractory time for spiking neurons
+        self.refractory_time[spike_mask] = self.tau_ref + t_spike
+
+        self.inh = self.inh * np.exp(-dt / self.tau_inh) + self.inc_inh * (self.output > 0)  # <--- ADDED
+
+        return self.output  # Return the output spikes
+
+class LIF:
+    def __init__(self, n=1, dim=1, tau_rc=0.02, tau_ref=0.002, v_th=1, 
+                 max_rates=[200, 400], intercept_range=[-1, 1], t_step=0.001, v_init = 0):
+        self.n = n
+        # Set neuron parameters
+        self.dim = dim  # Dimensionality of the input
+        self.tau_rc = tau_rc  # Membrane time constant
+        self.tau_ref = tau_ref  # Refractory period
+        self.v_th = np.ones(n) * v_th  # Threshold voltage for spiking
+        self.t_step = t_step  # Time step for simulation
+        
+        # Initialize state variables
+        self.voltage = np.ones(n) * v_init  # Initial voltage of neurons
+        self.refractory_time = np.zeros(n)  # Time remaining in refractory period
+        self.output = np.zeros(n)  # Output spikes
+
+        # Generate random max rates and intercepts within the given range
+        max_rates_tensor = np.random.uniform(max_rates[0], max_rates[1], n)
+        intercepts_tensor = np.random.uniform(intercept_range[0], intercept_range[1], n)
+
+        # Calculate gain and bias for each neuron
+        self.gain = self.v_th * (1 - 1 / (1 - np.exp((self.tau_ref - 1/max_rates_tensor) / self.tau_rc))) / (intercepts_tensor - 1)
+        self.bias = np.expand_dims(self.v_th - self.gain * intercepts_tensor, axis=1)
+        
+        # Initialize random encoders
+        self.encoders = np.random.randn(n, self.dim)
+        self.encoders /= np.linalg.norm(self.encoders, axis=1)[:, np.newaxis]
+
+    def reset(self):
+        # Reset the state variables to initial conditions
+        self.voltage = np.zeros(self.n)
+        self.refractory_time = np.zeros(self.n)
+        self.output = np.zeros(self.n)
+
+    def step(self, inputs):
+        dt = self.t_step  # Time step
+
+        # Update refractory time
+        self.refractory_time -= dt
+        delta_t = np.clip(dt - self.refractory_time, 0, dt) # ensure between 0 and dt
+
+        # Calculate input current
+        I = np.sum(self.bias + inputs * self.encoders * self.gain[:, np.newaxis], axis=1)
+
+        # Update membrane potential
+        self.voltage = I + (self.voltage - I) * np.exp(-delta_t / self.tau_rc)
+
+        # Determine which neurons spike
+        spike_mask = self.voltage > self.v_th
+        self.output[:] = spike_mask / dt  # Record spikes in output
+
+        # Calculate the time of the spike
+        t_spike = self.tau_rc * np.log((self.voltage[spike_mask] - I[spike_mask]) / (self.v_th[spike_mask] - I[spike_mask])) + dt
+
+        # Reset voltage of spiking neurons
+        self.voltage[spike_mask] = 0
+
+        # Set refractory time for spiking neurons
+        self.refractory_time[spike_mask] = self.tau_ref + t_spike
+
+        return self.output  # Return the output spikes
+
+t_step = 0.001
+def getFiringRate(inp, neuron, runtime=10):
+    times = np.arange(0, runtime, t_step)
+    num_spikes = 0
+    for t in times:
+        neuron.step(inp)
+        if neuron.output[0] > 0:
+            num_spikes += 1
+    return num_spikes / runtime
+
+alifs = ALIF(n=1, tau_ref=0.002, tau_rc=0.2, t_step=t_step, tau_inh=tau_inh, inc_inh=inc_inh)
+lifs  =  LIF(n=1, tau_ref=0.002, tau_rc=0.2, t_step=t_step)
+
+alifs.bias = lifs.bias = np.array([0]) ; alifs.gain = lifs.gain = np.array([1]) ; alifs.encoders = lifs.encoders = np.array([[1]]) # Remove the random gain, bias, and encoders
+
+rates = []
+
+for inp in np.linspace(0.9, 2, 200):
+    alifFiringRate = getFiringRate(inp, alifs)
+    lifFiringRate  = getFiringRate(inp, lifs)
+
+    alifs.reset() ; lifs.reset()
+    rates.append((inp, alifFiringRate, lifFiringRate))
+
+plt.figure()
+plt.plot([r[0] for r in rates], [r[1] for r in rates], label='ALIF')
+plt.plot([r[0] for r in rates], [r[2] for r in rates], label='LIF')
+plt.legend()
+plt.show()
+``` --><p>Note here how the ALIF (blue line) is less sensitive to changes in input than the normal LIF. If we decrease <code class="docutils literal notranslate"><span class="pre">tau_inh</span></code>, our ALIF behaves more and more like the LIF model (since the inhibition disappears more quickly).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotFiringRates</span><span class="p">(</span><span class="n">tau_inh</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">inc_inh</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/e999be94dd9f404b8b4b230dfb1c75bfa43a5f3738c2e42552010ab7f6d009bd.png" src="../_images/e999be94dd9f404b8b4b230dfb1c75bfa43a5f3738c2e42552010ab7f6d009bd.png" />
+</div>
+</div>
+<p>Similarly, if we decrease <code class="docutils literal notranslate"><span class="pre">inc_inh</span></code>, our ALIF behaves more and more like the LIF model (since the inhibition changes less).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plotFiringRates</span><span class="p">(</span><span class="n">tau_inh</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">inc_inh</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/8c9fc31da530fbec0d1d87fb0ec2cc81e8fde3a8179895e2029d4360dc7d5445.png" src="../_images/8c9fc31da530fbec0d1d87fb0ec2cc81e8fde3a8179895e2029d4360dc7d5445.png" />
+</div>
+</div>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Adaptive LIF neurons introduce a variable firing threshold <span class="math notranslate nohighlight">\(\vartheta_{th}(t) = v_{th} + w(t)\)</span></p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(v_{th}\)</span> is the “original” firing threshold</p></li>
+<li><p><span class="math notranslate nohighlight">\(w_{t}\)</span> is an additional threshold that changes over time: <span class="math notranslate nohighlight">\(w'(t) = -\frac{1}{\tau_w}w(t)\)</span></p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(\tau_w\)</span> is a time constant that controls how quickly <span class="math notranslate nohighlight">\(w(t)\)</span> decays</p></li>
+<li><p>if there is a spike at time <span class="math notranslate nohighlight">\(t\)</span> then <span class="math notranslate nohighlight">\(w(t)\)</span> increases by some constant <span class="math notranslate nohighlight">\(b\)</span>.</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Adaptive LIFs can help us make our LIFs’ firing rate less sensitive to input variability</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="14%20-%20Weights%20and%20Connections.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Weights and Connections</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="16%20-%20STDP.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Learning through Spike-Timing Dependent Plasticity (STDP)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

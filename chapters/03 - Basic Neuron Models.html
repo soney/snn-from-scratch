@@ -1,0 +1,713 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Basic Neuron Models &#8212; Building Spiking Neural Networks (SNNs) from Scratch</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/03 - Basic Neuron Models';</script>
+    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
+    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
+    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
+    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
+    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
+    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
+    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
+    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
+    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
+    <script src="../_static/pyodide.js?v=94982383"></script>
+    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
+    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
+    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
+    <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
+    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="First-Order Approximations of LI Neurons" href="04%20-%20First%20Order%20LI.html" />
+    <link rel="prev" title="Using this Textbook" href="02%20-%20Textbook.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="01%20-%20Root.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nmc-logo.png" class="logo__image only-light" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>
+    <script>document.write(`<img src="../_static/nmc-logo.png" class="logo__image only-dark" alt="Building Spiking Neural Networks (SNNs) from Scratch - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="01%20-%20Root.html">
+                    Building Spiking Neural Networks (SNNs) from Scratch
+                </a>
+            </li>
+        </ul>
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="02%20-%20Textbook.html">Using this Textbook</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Modeling LIF Neurons</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Basic Neuron Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04%20-%20First%20Order%20LI.html">First-Order Approximations of LI Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="05%20-%20Implementing%20Firing.html">Implementing Firing in LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html">Firing Rates and Tuning Curves</a></li>
+<li class="toctree-l1"><a class="reference internal" href="07%20-%20Synapses.html">Synapses</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Encoding Information</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="08%20-%20Encoding%20and%20Decoding%20Information.html">Encoding and Decoding Information</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="09%20-%20Collections%20of%20Neurons.html">Collections of Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="10%20-%20Translating%20Data%20to%20Spikes.html">Translating Data to Spikes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="11%20-%20Representing%202D%20Images.html">Representing 2D Images</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Scaling Up</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="12%20-%20Improving%20Accuracy.html">Improving Accuracy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="13%20-%20Neuron%20Collections.html">Neuron Collections</a></li>
+<li class="toctree-l1"><a class="reference internal" href="14%20-%20Weights%20and%20Connections.html">Weights and Connections</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Learning and Adaptation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="15%20-%20Adaptive%20LIF%20Neurons.html">Adaptive LIF Neurons</a></li>
+<li class="toctree-l1"><a class="reference internal" href="16%20-%20STDP.html">Learning through Spike-Timing Dependent Plasticity (STDP)</a></li>
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Research Replication</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="17%20-%20Research%20Replication%201.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="18%20-%20Research%20Replication%202.html">Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 2)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/soney/snn-from-scratch/issues/new?title=Issue%20on%20page%20%2Fchapters/03 - Basic Neuron Models.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/chapters/03 - Basic Neuron Models.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Basic Neuron Models</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neurons-communicate-through-spikes">Neurons Communicate Through Spikes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#leaky-integrate-and-fire-lif-neurons">Leaky Integrate-and-Fire (LIF) Neurons</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modeling-lif-neurons">Modeling LIF Neurons</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#firing">Firing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="basic-neuron-models">
+<h1>Basic Neuron Models<a class="headerlink" href="#basic-neuron-models" title="Link to this heading">#</a></h1>
+<p>The <strong>neuron</strong> is the most fundamental conceptual unit of neuromorphic computing. I will use the term “biological neuron” to refer to the neurons in our brain and “neuron” to refer to the artificial neurons. These artificial neurons can be simulated in software (as will be the case in this tutorial) or might be represented in hardware on a neuromorphic chip.</p>
+<section id="neurons-communicate-through-spikes">
+<h2>Neurons Communicate Through Spikes<a class="headerlink" href="#neurons-communicate-through-spikes" title="Link to this heading">#</a></h2>
+<p>In our brains, biological neurons (about 87 billion of them) are connected in complex networks. Biological neurons communicate with each other through <strong>spikes</strong> (also known as action potentials or nerve impulses). Spikes are short (about 2 milliseconds) electrical impulses that are transmitted between neurons through chemical signals.</p>
+<p>We use the term “pre-synaptic” to refer to the neuron that is “sending” the spike and “post-synapctic” to refer to the neuron that is receiving the spike. Many pre-synaptic neurons might connect to a single post-synapctic neuron. Post-synaptic neurons can also connect back to pre-synaptic neurons, forming loops.</p>
+<p>A simple set of low-level rules determine when neurons spike. In short, when the neuron’s potential energy (which it can build up through pre-synaptic neuron spikes) exceeds a threshold, a neuron spikes.</p>
+</section>
+<section id="leaky-integrate-and-fire-lif-neurons">
+<h2>Leaky Integrate-and-Fire (LIF) Neurons<a class="headerlink" href="#leaky-integrate-and-fire-lif-neurons" title="Link to this heading">#</a></h2>
+<p><em>“All models are wrong but some are useful”</em>.</p>
+<p>Rather than replicating the biological and chemical processes that take place in the brain, neuromorphic hardware simulates the basic operations of our brains. These simulations are not precise but they try to capture the important functional aspects.</p>
+<p>One of the simplest models of neuron dynamics is the <em>leaky integrate-and-fire (LIF)</em> model. This model has gained widespread popularity because it behaves similarly to biological neurons, is relatively inexpensive to implement in hardware, and is conceptually straightforward.</p>
+<p>The name “leaky integrate-and-fire” reveals the fundamental properties of these neurons. The post-synaptic neuron adds up (<em>integrates</em>) the inputs from the connected pre-synaptic neurons but its value decreases (<em>leaks</em>) over time. If the sum of those inputs reaches a minimum threshold, it <em>fires</em>.</p>
+</section>
+<section id="modeling-lif-neurons">
+<h2>Modeling LIF Neurons<a class="headerlink" href="#modeling-lif-neurons" title="Link to this heading">#</a></h2>
+<p>Let’s first try to understand roughly how LIF neurons behave. We will use a leaky bucket analogy (most LIF descriptions use a circuit representation but a bucket is easier to visualize).</p>
+<p>First, imagine a the neuron as a bucket with a bottom made out of rubber. The more we fill up this bucket, the more the bottom sags under the weight of the water. The amount of water represents the “potential” of biological neurons, which is how close the neuron is to firing (lower numbers mean it is further away from firing).</p>
+<p>Drag the slider below:</p>
+<div class="custom---static-bucket"
+                                          data-arguments = "[]"
+                                          data-options   = "{}"
+                                          data-content   = "&quot;&quot;"
+                                          id             = "static-bucket-1-hash6639923263571723337"
+                                          ></div><p>Now, imagine that we poke a small hole in the rubber bottom of this bucket. When we fill the bucket with water, it will slowly leak out of the hole in the bottom. If we add more water, the hole in the rubber expands and lets out more water. This leakiness represents the fact that in biological neurons, the membrane potential decreases over time without additional inputs.</p>
+<p>Try clicking the “Add water” button below quickly and watch the speed at which the water leaks out of the bucket. Note how it leaks out much more quickly when the bucket is full than when it is empty.</p>
+<div class="custom---leaky-bucket"
+                                          data-arguments = "[]"
+                                          data-options   = "{&quot;fires&quot;: &quot;False&quot;}"
+                                          data-content   = "&quot;&quot;"
+                                          id             = "leaky-bucket-1-hash3791583164863488268"
+                                          ></div><p>Throughout these tutorials, we will ease into a mathematical notation to represent the state (status) and dynamics (change over time) of neurons. We will refer to the potential as <span class="math notranslate nohighlight">\(v\)</span> (for <em>v</em>oltage). Because this potential changes over time, we will represent it as a function of time, <span class="math notranslate nohighlight">\(t\)</span>:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(v(t)\)</span>: The potential of the neuron (how full the bucket is) at time <span class="math notranslate nohighlight">\(t\)</span></p></li>
+</ul>
+<p>The speed at which water leaks out of our bucket is mathematically defined as how <span class="math notranslate nohighlight">\(v(t)\)</span> changes over time. We refer to the amount that <span class="math notranslate nohighlight">\(v(t)\)</span> is changing at time <span class="math notranslate nohighlight">\(t\)</span> as <span class="math notranslate nohighlight">\(v'(t)\)</span> (pronounced “v <em>prime</em> of t”):</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(v'(t)\)</span>: The rate of change of <span class="math notranslate nohighlight">\(v(t)\)</span> at time <span class="math notranslate nohighlight">\(t\)</span>.</p>
+<ul>
+<li><p>When it is negative (<span class="math notranslate nohighlight">\(v'(t) &lt; 0\)</span>), we are losing water (for example, this is what happens as our water leaks out).</p></li>
+<li><p>When it is positive (<span class="math notranslate nohighlight">\(v'(t) &gt; 0\)</span>), we are adding water (for example, this is what happens when we click the “add water” button).</p></li>
+</ul>
+</li>
+</ul>
+<p>Conceptually, <span class="math notranslate nohighlight">\(v'(t)\)</span> depends on a few values:</p>
+<ul class="simple">
+<li><p>The amount of incoming water being added at time <span class="math notranslate nohighlight">\(t\)</span> (as in: are we pressing the “Add water” button?), which we will refer to as <span class="math notranslate nohighlight">\(I(t)\)</span></p></li>
+<li><p>How full the bucket is (remember that our water leaks out faster if the bucket is more full), which we already called <span class="math notranslate nohighlight">\(v(t)\)</span></p></li>
+<li><p>How the hole grows in relation to the amount of water (how “stretchy” the hole is), which we will refer to as <span class="math notranslate nohighlight">\(\tau\)</span></p></li>
+<li><p>The size of the hole (which we will leave fixed so won’t refer to by any variable)</p></li>
+</ul>
+<p>We are going to use a formula for that satisfies all of these constraints:</p>
+<div class="math notranslate nohighlight" id="equation-eq-dvdt">
+<span class="eqno">(1)<a class="headerlink" href="#equation-eq-dvdt" title="Link to this equation">#</a></span>\[
+v'(t) = \frac{1}{\tau}I(t) - \frac{1}{\tau}v(t)
+\]</div>
+<p>A more detailed derivation of this is given in <a class="reference internal" href="#ssec-circuit-model"><span class="std std-ref">the optional “Circuit Model” section at the end of this page</span></a>. Let’s focus on how “stretchy” the hole is (<span class="math notranslate nohighlight">\(\tau\)</span>). Our water will leak out faster (meaning <span class="math notranslate nohighlight">\(v'(t)\)</span> is more negative) for lower values of <span class="math notranslate nohighlight">\(\tau\)</span>. When you press the button below, it will add water to all three buckets (each with different values of <span class="math notranslate nohighlight">\(\tau\)</span>):</p>
+<p><button id="add-water">Add Water to all 3 buckets</button></p>
+<p><span class="math notranslate nohighlight">\(\tau = 500\)</span>:</p>
+<div class="custom---leaky-bucket"
+                                          data-arguments = "[]"
+                                          data-options   = "{&quot;fires&quot;: &quot;False&quot;, &quot;tau_rc&quot;: &quot;500&quot;, &quot;button_selector&quot;: &quot;#add-water&quot;}"
+                                          data-content   = "&quot;&quot;"
+                                          id             = "leaky-bucket-2-hash8017536301200099886"
+                                          ></div><p><span class="math notranslate nohighlight">\(\tau = 1000\)</span>:</p>
+<div class="custom---leaky-bucket"
+                                          data-arguments = "[]"
+                                          data-options   = "{&quot;fires&quot;: &quot;False&quot;, &quot;tau_rc&quot;: &quot;1000&quot;, &quot;button_selector&quot;: &quot;#add-water&quot;}"
+                                          data-content   = "&quot;&quot;"
+                                          id             = "leaky-bucket-3-hash6310171309708184787"
+                                          ></div><p><span class="math notranslate nohighlight">\(\tau = 3000\)</span>:</p>
+<div class="custom---leaky-bucket"
+                                          data-arguments = "[]"
+                                          data-options   = "{&quot;fires&quot;: &quot;False&quot;, &quot;tau_rc&quot;: &quot;3000&quot;, &quot;button_selector&quot;: &quot;#add-water&quot;}"
+                                          data-content   = "&quot;&quot;"
+                                          id             = "leaky-bucket-4-hash-5984932973341805779"
+                                          ></div><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3" id="ssec-circuit-model">
+<summary class="sd-summary-title sd-card-header">
+<span class="sd-summary-text">The Circuit Model (Optional)</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
+<h2 class="rubric" id="the-circuit-model">The Circuit Model</h2>
+<p class="sd-card-text">Above, we modeled our neuron using the analogy of buckets and water. However, the “standard” way of introducing the LIF model is with <a class="reference external" href="https://en.wikipedia.org/wiki/RC_circuit">a resistor-capacitor (RC) circuit</a>, like the one below:</p>
+<p class="sd-card-text"><img alt="RC Circuit" src="../_images/rc_circuit.png" /></p>
+<p class="sd-card-text">In this circuit, <span class="math notranslate nohighlight">\(I(t)\)</span> represents the amount of current coming into the neuron. <span class="math notranslate nohighlight">\(R\)</span> represents the resistance of a resistor in parallel with a capacitor (with capacitance <span class="math notranslate nohighlight">\(C\)</span>). Our potential, <span class="math notranslate nohighlight">\(v(t)\)</span>, represents the potential difference between both ends of our circuit.</p>
+<p class="sd-card-text">The total amount of current that will flow through the circuit (<span class="math notranslate nohighlight">\(I(t)\)</span>) is the amount that flows through the resistor (which we’ll call <span class="math notranslate nohighlight">\(I_{R}(t)\)</span>) plus the amount that flows through the capacitor (which we’ll call <span class="math notranslate nohighlight">\(I_C(t)\)</span>):</p>
+<div class="math notranslate nohighlight">
+\[I(t) = I_R(t) + I_C(t)\]</div>
+<p class="sd-card-text">We can use some circuit equations to put this in terms of <span class="math notranslate nohighlight">\(v(t)\)</span>, <span class="math notranslate nohighlight">\(R\)</span>, and <span class="math notranslate nohighlight">\(C\)</span>:</p>
+<ul class="simple">
+<li><p class="sd-card-text">From <a class="reference external" href="https://en.wikipedia.org/wiki/Ohm%27s_law">Ohm’s law</a>: <span class="math notranslate nohighlight">\(I_R(t) = \frac{v(t)}{R}\)</span></p></li>
+<li><p class="sd-card-text">For the capacitor, <a class="reference external" href="https://en.wikipedia.org/wiki/Capacitor#Overview">the current is</a>: <span class="math notranslate nohighlight">\(I_C(t) = Cv'(t)\)</span></p></li>
+</ul>
+<p class="sd-card-text">This gives:</p>
+<div class="math notranslate nohighlight">
+\[I(t) = \frac{v(t)}{R} + Cv'(t)\]</div>
+<div class="math notranslate nohighlight">
+\[v'(t) = \frac{1}{C}I(t) - \frac{1}{RC}v(t)\]</div>
+<p class="sd-card-text">If we use <span class="math notranslate nohighlight">\(\tau_{rc}\)</span> as a replacement for <span class="math notranslate nohighlight">\(RC\)</span> and use <span class="math notranslate nohighlight">\(I_2(t)\)</span> as a replacement for <span class="math notranslate nohighlight">\(RI(t)\)</span> we get:</p>
+<div class="math notranslate nohighlight">
+\[v'(t) = \frac{1}{\tau_{rc}}I_2(t) - \frac{1}{\tau_{rc}}v(t)\]</div>
+<p class="sd-card-text">This equation is exactly what we have above<a class="reference internal" href="#equation-eq-dvdt">(1)</a>, with different names (using <span class="math notranslate nohighlight">\(I_2(t)\)</span> instead of <span class="math notranslate nohighlight">\(I(t)\)</span> and <span class="math notranslate nohighlight">\(\tau_{rc}\)</span> instead of <span class="math notranslate nohighlight">\(\tau\)</span>).</p>
+</div>
+</details></section>
+<section id="firing">
+<h2>Firing<a class="headerlink" href="#firing" title="Link to this heading">#</a></h2>
+<p>When the water reaches the top of the bucket, we are going to say that the neuron “fired”. This represents the fact that once the potential reaches a “firing threshold”, the neuron fires (or triggers an “action potential”). We call that firing threshold <span class="math notranslate nohighlight">\(v_{th}\)</span>. So in other words, our neuron will fire when <span class="math notranslate nohighlight">\(v(t) \ge v_{th}\)</span>.</p>
+<p>After this happens, the neuron enters a “refractory period” where its potential resets and the neuron cannot fire. Now, when the bucket fills to the top, it will change color to indicate that the neuron “fired” and the bucket is in its refractory period. Try filling the bucket below by adding water:</p>
+<div class="custom---leaky-bucket"
+                                          data-arguments = "[]"
+                                          data-options   = "{&quot;fires&quot;: &quot;True&quot;}"
+                                          data-content   = "&quot;&quot;"
+                                          id             = "leaky-bucket-5-hash445413002828884884"
+                                          ></div></section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Neurons are the fundamental building blocks of Spiking Neural Networks (SNNs)</p></li>
+<li><p>We will use a popular model (approximation) of neuron dynamics, called the Leaky Integrate and Fire (LIF) model</p></li>
+<li><p>In the LIF model, the neuron has a potential (<span class="math notranslate nohighlight">\(v(t)\)</span>) that represents how close the neuron is to firing</p></li>
+<li><p>We refer to the rate of change of this potential as <span class="math notranslate nohighlight">\(v'(t)\)</span> (“v prime of t”). It depends on:</p>
+<ul>
+<li><p>The energy being added (<span class="math notranslate nohighlight">\(I(t)\)</span>)</p></li>
+<li><p>A time constant (<span class="math notranslate nohighlight">\(\tau\)</span>)—higher values of <span class="math notranslate nohighlight">\(\tau\)</span> mean that <span class="math notranslate nohighlight">\(v'(t)\)</span> is closer to zero (in the bucket analogy, the water leaks out slower for higher values of <span class="math notranslate nohighlight">\(\tau\)</span>)</p></li>
+<li><p>The potential energy itself (<span class="math notranslate nohighlight">\(v(t)\)</span>)—the more positive <span class="math notranslate nohighlight">\(v(t)\)</span> is, the more negative <span class="math notranslate nohighlight">\(v'(t)\)</span> will be (in the bucket analogy, the water leaks out faster when the bucket is more full).</p></li>
+</ul>
+</li>
+<li><p>When the potential is greater than some threshold (<span class="math notranslate nohighlight">\(v(t) \ge v_{th}\)</span>), our neuron will fire</p></li>
+</ul>
+</section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>The <a class="reference external" href="https://neuronaldynamics.epfl.ch/online/Ch1.S3.html">Neuronal Dynamics Book (Ch) 1.3</a> contains much more detail on neuron models</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./chapters"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="02%20-%20Textbook.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Using this Textbook</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="04%20-%20First%20Order%20LI.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">First-Order Approximations of LI Neurons</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neurons-communicate-through-spikes">Neurons Communicate Through Spikes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#leaky-integrate-and-fire-lif-neurons">Leaky Integrate-and-Fire (LIF) Neurons</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modeling-lif-neurons">Modeling LIF Neurons</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#firing">Firing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#resources">Resources</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Steve Oney
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
