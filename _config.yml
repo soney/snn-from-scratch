@@ -52,6 +52,7 @@ parse:
     myst_dmath_double_inline: true  # Allow display math ($$) within an inline context
 
 sphinx:
-    extra_extensions: [jupyterlite_sphinx]
+    # extra_extensions: [jupyterlite_sphinx]
+    extra_extensions: []
     local_extensions:
         javascript: ext/

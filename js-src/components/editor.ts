@@ -41,7 +41,7 @@ const languages: {[lang: string]: LangSupport} = {
             output.classList.add("code-output");
 
             const pyodidePromise = loadPyodide({
-                // indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.1/full/",
+                // indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/",
                 indexURL: "/_static/pyodide/",
                 stdin: window.prompt,
                 stdout: (text: string) => {
