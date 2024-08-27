@@ -42,7 +42,7 @@ const languages: {[lang: string]: LangSupport} = {
 
             const pyodidePromise = loadPyodide({
                 // indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/",
-                indexURL: "/_static/pyodide/",
+                indexURL: "../_static/pyodide/",
                 stdin: window.prompt,
                 stdout: (text: string) => {
                     const textOutput = output.querySelector("pre.current-output");
