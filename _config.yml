@@ -6,6 +6,7 @@ author: Steve Oney
 copyright: "2024"
 exclude_patterns: [_build, Thumbs.db, .DS_Store, "**.ipynb_checkpoints", "datasets", .venv, node_modules, README.md]
 logo: nmc-logo.png
+only_build_toc_files: true
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html

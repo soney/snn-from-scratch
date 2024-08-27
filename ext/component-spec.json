@@ -59,14 +59,14 @@
     "option_names": []
   },
   {
-    "name": "poisson-spikes",
+    "name": "scaled-spikes-by-frequency",
     "has_content": false,
     "required_arguments": 0,
     "optional_arguments": 0,
     "option_names": []
   },
   {
-    "name": "scaled-spikes-by-frequency",
+    "name": "poisson-spikes",
     "has_content": false,
     "required_arguments": 0,
     "optional_arguments": 0,
