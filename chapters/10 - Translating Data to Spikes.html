@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -64,22 +61,10 @@
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/10 - Translating Data to Spikes';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Representing 2D Images" href="11%20-%20Representing%202D%20Images.html" />
@@ -525,7 +510,7 @@ document.write(`
                                           data-arguments = "[]"
                                           data-options   = "{}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "spikes-by-frequency-1-hash6639923263571723337"
+                                          id             = "spikes-by-frequency-1-hash-8746514286489854841"
                                           ></div><p>This works but has a few problems. First, it does not account for things like negative numbers (you can’t have a negative frequency). So let’s say that we assume that <span class="math notranslate nohighlight">\(v\)</span> is in the range <span class="math notranslate nohighlight">\([v_{min}, v_{max}]\)</span>. We can then scale our prior value of <span class="math notranslate nohighlight">\(v\)</span> to be <span class="math notranslate nohighlight">\(v_s\)</span> and ensure it is in the range <span class="math notranslate nohighlight">\([0, 1]\)</span>: <span class="math notranslate nohighlight">\(v_s = \frac{v-v_{min}}{v_{max}-v_{min}}\)</span>.</p>
 <p>Then, if we want it to use frequencies outside of <span class="math notranslate nohighlight">\([0, 1]\)</span> (say we want frequencies in the range <span class="math notranslate nohighlight">\([f_{min}, f_{max}]\)</span>), we can do: <span class="math notranslate nohighlight">\(f_s(v) = f_{min} + v_s(f_{max}-f_{min}) = f_{min} + \frac{v-v_{min}}{v_{max}-v_{min}}(f_{max}-f_{min})\)</span>.</p>
 <div class="cell tag_hide-input docutils container">
@@ -556,7 +541,7 @@ document.write(`
                                           data-arguments = "[]"
                                           data-options   = "{}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "scaled-spikes-by-frequency-1-hash6639923263571723337"
+                                          id             = "scaled-spikes-by-frequency-1-hash-8746514286489854841"
                                           ></div><p>This works but it has a few drawbacks. First, if we want regular spiking intervals then we need to have some notion of state in order to track if we should fire at a given timestep or not. Second, it does not contain any noise. Noise can help improve the robustness of our systems (and make them more realistic) by (1) ensuring that the system is recognizing common underlying patterns rather than overfitting to specific examples and (2) making sure it is more tolerant to errors and noisier inputs.</p>
 <p>Instead, it is common to use Poisson processes to represent these data probabilistically.</p>
 <section id="probabilistic-firing">
@@ -608,8 +593,8 @@ document.write(`
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../_images/5b22d053324bc42bd6025a7c4be5a99f7b9bd7e9a8ec481a520b5530e67e81ad.png" src="../_images/5b22d053324bc42bd6025a7c4be5a99f7b9bd7e9a8ec481a520b5530e67e81ad.png" />
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Spikes: 74 over 100 seconds (0.74 Hz). Estimated Value: 7.40 (Actual: 10; Error: 2.60)
+<img alt="../_images/d11db90c0fa02a8a8be706205dcfdf17ea3d6bd019ec8f2f6f1687380f950f3e.png" src="../_images/d11db90c0fa02a8a8be706205dcfdf17ea3d6bd019ec8f2f6f1687380f950f3e.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Spikes: 117 over 100 seconds (1.17 Hz). Estimated Value: 11.70 (Actual: 10; Error: 1.70)
 </pre></div>
 </div>
 </div>
@@ -618,7 +603,7 @@ document.write(`
                                           data-arguments = "[]"
                                           data-options   = "{}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "poisson-spikes-1-hash6639923263571723337"
+                                          id             = "poisson-spikes-1-hash-8746514286489854841"
                                           ></div><p>Let’s look at how the estimated value varies compared to the actual value when we do this. For now, we’ll use the values <code class="docutils literal notranslate"><span class="pre">f_min</span> <span class="pre">=</span> <span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">f_max</span> <span class="pre">=</span> <span class="pre">100</span></code>, <code class="docutils literal notranslate"><span class="pre">x_min</span> <span class="pre">=</span> <span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">x_max</span> <span class="pre">=</span> <span class="pre">100</span></code>. We’ll use a discrete time simulation with <code class="docutils literal notranslate"><span class="pre">Tstep</span> <span class="pre">=</span> <span class="pre">0.01</span></code> for every step:</p>
 <div class="cell tag_hide-input docutils container">
 <details class="hide above-input">
@@ -657,7 +642,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/906aa069308c2e354890160dd50873808726fc1b39bf8cbfe8a9506b73f4ee79.png" src="../_images/906aa069308c2e354890160dd50873808726fc1b39bf8cbfe8a9506b73f4ee79.png" />
+<img alt="../_images/1583e18782aaf26e6f7cec3ecca0ee8f7e097b5faa7b0c7c2d735e48de80325c.png" src="../_images/1583e18782aaf26e6f7cec3ecca0ee8f7e097b5faa7b0c7c2d735e48de80325c.png" />
 </div>
 </div>
 <p>We can see that our reconstructed estimates look fairly reasonable. Now let’s look at what happens if we increase <code class="docutils literal notranslate"><span class="pre">f_max</span></code> to <code class="docutils literal notranslate"><span class="pre">200</span></code>:</p>
@@ -668,7 +653,7 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/137dc64703a67a5ab11a017887d1093b7868729335359f3696c82eb69345b9f9.png" src="../_images/137dc64703a67a5ab11a017887d1093b7868729335359f3696c82eb69345b9f9.png" />
+<img alt="../_images/6571681cc486dfedc2bbb95af07cbdb8d521304f4169e6067c651ed257f25de6.png" src="../_images/6571681cc486dfedc2bbb95af07cbdb8d521304f4169e6067c651ed257f25de6.png" />
 </div>
 </div>
 <p>Notice how our estimate stops increasing around <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">2.5</span></code>? This corresponds to a frequency of 100 Hz. Given that we had a value of <code class="docutils literal notranslate"><span class="pre">Tstep</span> <span class="pre">=</span> <span class="pre">0.01</span></code>, we can never achieve a frequency greater than <span class="math notranslate nohighlight">\(\frac{1}{T_{step}} = 100\)</span> since we can only fire a maximum of one time per time step in our discrete time simulation.</p>

@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -62,22 +59,10 @@
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/18 - Research Replication 2';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="Research Replication: Unsupervised Learning of Digit Recognition Using STDP (Part 1)" href="17%20-%20Research%20Replication%201.html" />
@@ -674,7 +659,12 @@ document.write(`
 </div>
 </details>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -691,13 +681,19 @@ document.write(`
 </pre></div>
 </div>
 </div>
+</details>
 <div class="cell_output docutils container">
 <img alt="../_images/3375633e286d7b95fcc8c06c79f663bc9580af0961b8db84739c95df5505ec57.png" src="../_images/3375633e286d7b95fcc8c06c79f663bc9580af0961b8db84739c95df5505ec57.png" />
 </div>
 </div>
 <p>As you can see, most of these weights look like clearly discernable numbers. Each neuron is responsive to a particular digit (and a particularly way of drawing that digit). Each of these neurons is labeled according to the digit it responds to but we’ll pre-label them all.</p>
 <p>We are also going to use pre-set firing thresholds for our excitatory neurons’ ALIFs. When we’re actually running our network, we will “freeze” both the STDP weights and the excitatory ALIFs’ firing thresholds.</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">json</span>
@@ -729,8 +725,14 @@ document.write(`
 </pre></div>
 </div>
 </div>
+</details>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../_static/datasets/theta.json&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">theta_file</span><span class="p">:</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">theta_file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
@@ -784,6 +786,7 @@ document.write(`
 </pre></div>
 </div>
 </div>
+</details>
 </div>
 <p>Then, we can run an example of our network classifying a new digit, highlighting the neuron(s) that fire most below (indicating that those are the neurons that “recognized” the digit).</p>
 <div class="cell tag_hide-input docutils container">
@@ -860,6 +863,7 @@ document.write(`
 <img alt="../_images/d308e9308b7d5d78c0229e1a2b76660526cd129c0271fda908e670201e7626a4.png" src="../_images/d308e9308b7d5d78c0229e1a2b76660526cd129c0271fda908e670201e7626a4.png" />
 </div>
 </div>
+<p>Our simulation worked well this time; the neurons that fired most were the ones that corresponded to the digit in the image (though the network is often inaccurate).</p>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
 <ul class="simple">

@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -62,22 +59,10 @@
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/14 - Weights and Connections';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Adaptive LIF Neurons" href="15%20-%20Adaptive%20LIF%20Neurons.html" />
@@ -433,10 +418,15 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="weights-and-connections">
 <h1>Weights and Connections<a class="headerlink" href="#weights-and-connections" title="Link to this heading">#</a></h1>
-<p>WHen we have multiple groups of neurons, we then would want to <em>connect</em> them. This is done by assigning <em>weights</em> to the connections between the neurons, with the weights being the strength of the connection. For example, a weight of <code class="docutils literal notranslate"><span class="pre">0</span></code> would mean no connection, while a weight of <code class="docutils literal notranslate"><span class="pre">1</span></code> would mean a strong connection.</p>
+<p>When we have multiple groups of neurons, we then would want to <em>connect</em> them. This is done by assigning <em>weights</em> to the connections between the neurons, with the weights being the strength of the connection. For example, a weight of <code class="docutils literal notranslate"><span class="pre">0</span></code> would mean no connection, while a weight of <code class="docutils literal notranslate"><span class="pre">1</span></code> would mean a strong connection.</p>
 <p>We can <em>learn</em> connection weights in a variety of ways, as we will go into later.</p>
 <p>For now, we will initialize them randomly using <a class="reference external" href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.randn.html"><code class="docutils literal notranslate"><span class="pre">np.random.randn()</span></code></a>. This will give us a random number from a normal distribution with a mean of <code class="docutils literal notranslate"><span class="pre">0</span></code> and a standard deviation of <code class="docutils literal notranslate"><span class="pre">1</span></code>.:</p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -519,6 +509,7 @@ document.write(`
 </pre></div>
 </div>
 </div>
+</details>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -548,142 +539,6 @@ document.write(`
 
 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
     <span class="n">outp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell tag_hide-all docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span>
-
-<span class="c1"># decoder_a = getDecoders(neurons_a, func=func) </span>
-<span class="c1"># decoder_b = getDecoders(neurons_b)</span>
-
-<span class="c1"># # decoder_a = decoder_A</span>
-<span class="c1"># # print(decoder_a.shape)</span>
-<span class="c1"># # print(neurons_b.encoders.shape)</span>
-
-
-<span class="c1"># weights = decoder_a @ [neurons_b.encoders.flatten()]</span>
-<span class="c1"># # weights = np.random.randn(neurons_a.n, neurons_b.n)</span>
-<span class="c1"># # print(decoder_a.shape)</span>
-
-<span class="n">outp</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
-    <span class="n">a</span>  <span class="o">=</span> <span class="n">neurons_a</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
-    <span class="n">b</span>  <span class="o">=</span> <span class="n">synapses_a</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-    <span class="n">bw</span> <span class="o">=</span> <span class="n">b</span> <span class="o">@</span> <span class="n">weights</span>
-    <span class="n">c</span>  <span class="o">=</span> <span class="n">neurons_b</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">bw</span><span class="p">)</span>
-    <span class="n">d</span>  <span class="o">=</span> <span class="n">synapses_b</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
-    <span class="n">outp</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">bw</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">d</span>
-
-
-<span class="n">T</span> <span class="o">=</span> <span class="mi">10</span>
-
-<span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">t_step</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">inp</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">times</span><span class="p">:</span>
-    <span class="n">step</span><span class="p">(</span><span class="n">inp</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
-
-
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-<span class="n">a_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">outp</span><span class="p">))</span>
-<span class="n">b_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">outp</span><span class="p">))</span>
-<span class="n">bw_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">outp</span><span class="p">))</span>
-<span class="n">c_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">outp</span><span class="p">))</span>
-<span class="n">d_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">outp</span><span class="p">))</span>
-<span class="n">inps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">outp</span><span class="p">))</span>
-
-
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">inps</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">[</span><span class="n">func</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">inps</span><span class="p">])</span>
-<span class="c1"># plt.plot(times, b_out @ decoder_a)</span>
-<span class="c1"># plt.plot(times, d_out @ decoder_B)</span>
-<span class="c1"># plt.plot(times, a_out)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">[</span><span class="n">b</span> <span class="o">*</span> <span class="n">t_step</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bw_out</span><span class="p">])</span>
-<span class="c1"># plt.plot(times, bw_out)</span>
-<span class="c1"># plt.plot(times, c_out)</span>
-<span class="c1"># plt.plot(times, d_out)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/6612a530aca24cc038db0b4ca34e496332ff61ec19a53a7682d5eddfa046f82c.png" src="../_images/6612a530aca24cc038db0b4ca34e496332ff61ec19a53a7682d5eddfa046f82c.png" />
-</div>
-</div>
-<div class="cell tag_hide-all docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
-
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">random</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.001</span>  <span class="c1"># simulation time step</span>
-<span class="n">t_rc</span> <span class="o">=</span> <span class="mf">0.02</span>  <span class="c1"># membrane RC time constant</span>
-<span class="n">t_ref</span> <span class="o">=</span> <span class="mf">0.002</span>  <span class="c1"># refractory period</span>
-<span class="n">t_pstc</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># post-synaptic time constant</span>
-<span class="n">N_A</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># number of neurons in first population</span>
-<span class="n">N_B</span> <span class="o">=</span> <span class="mi">40</span>  <span class="c1"># number of neurons in second population</span>
-<span class="n">N_samples</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># number of sample points to use when finding decoders</span>
-<span class="n">rate_A</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">75</span>  <span class="c1"># range of maximum firing rates for population A</span>
-<span class="n">rate_B</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span>  <span class="c1"># range of maximum firing rates for population B</span>
-
-
-<span class="k">def</span> <span class="nf">input</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The input to the system over time&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;The function to compute between A and B.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span>
-
-
-<span class="c1"># create random encoders for the two populations</span>
-<span class="c1"># encoder_A = [random.choice([-1, 1]) for _ in range(N_A)]</span>
-<span class="c1"># encoder_B = [random.choice([-1, 1]) for _ in range(N_B)]</span>
-
-
-<span class="k">def</span> <span class="nf">generate_gain_and_bias</span><span class="p">(</span><span class="n">count</span><span class="p">,</span> <span class="n">intercept_low</span><span class="p">,</span> <span class="n">intercept_high</span><span class="p">,</span> <span class="n">rate_low</span><span class="p">,</span> <span class="n">rate_high</span><span class="p">):</span>
-    <span class="n">gain</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">bias</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
-        <span class="c1"># desired intercept (x value for which the neuron starts firing</span>
-        <span class="n">intercept</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">intercept_low</span><span class="p">,</span> <span class="n">intercept_high</span><span class="p">)</span>
-        <span class="c1"># desired maximum rate (firing rate when x is maximum)</span>
-        <span class="n">rate</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">rate_low</span><span class="p">,</span> <span class="n">rate_high</span><span class="p">)</span>
-
-        <span class="c1"># this algorithm is specific to LIF neurons, but should</span>
-        <span class="c1"># generate gain and bias values to produce the desired</span>
-        <span class="c1"># intercept and rate</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="n">t_ref</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">rate</span><span class="p">))</span> <span class="o">/</span> <span class="n">t_rc</span><span class="p">))</span>
-        <span class="n">g</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">intercept</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">g</span> <span class="o">*</span> <span class="n">intercept</span>
-        <span class="n">gain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
-        <span class="n">bias</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">gain</span><span class="p">,</span> <span class="n">bias</span>
-
-
-<span class="c1"># random gain and bias for the two populations</span>
-<span class="c1"># gain_A, bias_A = generate_gain_and_bias(N_A, -1, 1, rate_A[0], rate_A[1])</span>
-<span class="c1"># gain_B, bias_B = generate_gain_and_bias(N_B, -1, 1, rate_B[0], rate_B[1])</span>
-<span class="n">gain_A</span> <span class="o">=</span> <span class="n">neurons_a</span><span class="o">.</span><span class="n">gain</span>
-<span class="n">bias_A</span> <span class="o">=</span> <span class="n">neurons_a</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-<span class="n">encoder_A</span> <span class="o">=</span> <span class="n">neurons_a</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-
-<span class="n">gain_B</span> <span class="o">=</span> <span class="n">neurons_b</span><span class="o">.</span><span class="n">gain</span>
-<span class="n">bias_B</span> <span class="o">=</span> <span class="n">neurons_b</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-<span class="n">encoder_B</span> <span class="o">=</span> <span class="n">neurons_b</span><span class="o">.</span><span class="n">encoders</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>

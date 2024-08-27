@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 v = 10
-tau = 0.1  #<-SLIDE(0.01 to 1 by 0.001)
+tau = 0.100  #<-SLIDE(0.01 to 1 by 0.001)
 t_step = 0.01
 duration = 5
 
@@ -46,3 +46,4 @@ plt.plot(t, v_values, label='Voltage $v(t)$')
 plt.xlabel('Time (s)')
 plt.ylabel('Voltage (v)')
 plt.show()
+```

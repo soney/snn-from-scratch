@@ -1,0 +1,46 @@
+Traceback (most recent call last):
+  File "/home/soney/code/snn-from-scratch/.venv/lib/python3.12/site-packages/jupyter_cache/executors/utils.py", line 58, in single_nb_execution
+    executenb(
+  File "/home/soney/code/snn-from-scratch/.venv/lib/python3.12/site-packages/nbclient/client.py", line 1314, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soney/code/snn-from-scratch/.venv/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/soney/code/snn-from-scratch/.venv/lib/python3.12/site-packages/nbclient/client.py", line 709, in async_execute
+    await self.async_execute_cell(
+  File "/home/soney/code/snn-from-scratch/.venv/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/home/soney/code/snn-from-scratch/.venv/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+im = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 92, 193, 157, 217, 157, 14, 0, 0, 0, 0, 0, 0, 0, 69, 226, 253, 249, 253, 250, 130, 0, 0, 0, 0, 0, 0, 0, 71, 233, 248, 211, 184, 249, 162, 0, 0, 0, 0, 0, 0, 0, 15, 135, 112, 22, 106, 248, 162, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 191, 253, 162, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 190, 253, 250, 95, 0, 0, 0, 0, 0, 0, 0, 10, 100, 227, 253, 253, 203, 19, 0, 0, 0, 0, 0, 0, 0, 88, 242, 253, 253, 253, 227, 114, 41, 6, 0, 0, 0, 0, 0, 130, 253, 253, 242, 232, 252, 249, 229, 184, 102, 3, 0, 0, 0, 130, 253, 247, 139, 47, 157, 233, 253, 253, 243, 74, 0, 0, 0, 85, 199, 118, 16, 0, 3, 56, 140, 199, 212, 89, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+num_firings = [0] * len(im)
+
+dt = 0.001
+for i in range(1 / dt):
+    firings = poisson_fire(im)
+    for j in range(len(im)):
+        if firings[j]:
+            num_firings[j] += 1
+
+print(num_firings)
+------------------
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[3], line 6[0m
+[1;32m      3[0m num_firings [38;5;241m=[39m [[38;5;241m0[39m] [38;5;241m*[39m [38;5;28mlen[39m(im)
+[1;32m      5[0m dt [38;5;241m=[39m [38;5;241m0.001[39m
+[0;32m----> 6[0m [38;5;28;01mfor[39;00m i [38;5;129;01min[39;00m [38;5;28;43mrange[39;49m[43m([49m[38;5;241;43m1[39;49m[43m [49m[38;5;241;43m/[39;49m[43m [49m[43mdt[49m[43m)[49m:
+[1;32m      7[0m     firings [38;5;241m=[39m poisson_fire(im)
+[1;32m      8[0m     [38;5;28;01mfor[39;00m j [38;5;129;01min[39;00m [38;5;28mrange[39m([38;5;28mlen[39m(im)):
+
+[0;31mTypeError[0m: 'float' object cannot be interpreted as an integer
+

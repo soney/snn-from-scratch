@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -64,22 +61,10 @@
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/07 - Synapses';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Encoding and Decoding Information" href="08%20-%20Encoding%20and%20Decoding%20Information.html" />
@@ -521,7 +506,7 @@ g[t] &amp;= g[t-1] (1 - \frac{T_{step}}{\tau_s}) + \frac{T_{step}}{\tau_{s}}\del
                                           data-arguments = "[&quot;python&quot;]"
                                           data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;500px&quot;}"
                                           data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\n\ntau_s  = 0.050 # <-SLIDE(0.010 to 0.04 by 0.001)\nt_step = 0.005 # <-SLIDE(0.001 to 0.01 by 0.001)\n\ntimes = np.arange(0, 0.25, t_step)\n\ndef isZero(t): return abs(t) < t_step / 2 # check if t is close to zero\n\nareaUnderCurve = 0\ng = 0\ng_values = []\nfor t in times:\n    if isZero(t): spike_input = 1 / t_step # Spike input at t = 0\n    else:         spike_input = 0\n\n    g = g * (1 - t_step / tau_s) + spike_input * t_step / tau_s\n    g_values.append(g)\n\n    areaUnderCurve += g * t_step\n\n# Plot the data\nplt.figure()\nplt.plot(times, g_values)\nplt.bar(times, g_values, color='black', edgecolor=\&quot;#999\&quot;, width=t_step)\nplt.xlabel('t')\nplt.ylabel('g')\nplt.show()\n\nprint(f\&quot;Area under curve: {areaUnderCurve}\&quot;)&quot;"
-                                          id             = "editor-7-hash-4441154988726307116"
+                                          id             = "editor-7-hash-8952635290396189230"
                                           ></div></section>
 <section id="connecting-lifs-with-psps">
 <h2>Connecting LIFs with PSPs<a class="headerlink" href="#connecting-lifs-with-psps" title="Link to this heading">#</a></h2>

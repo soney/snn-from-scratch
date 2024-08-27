@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -64,22 +61,10 @@
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/09 - Collections of Neurons';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Translating Data to Spikes" href="10%20-%20Translating%20Data%20to%20Spikes.html" />
@@ -1005,7 +990,7 @@ document.write(`
                                           data-arguments = "[&quot;python&quot;]"
                                           data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;600px&quot;}"
                                           data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\nimport math\n\nNUM_NEURONS =     5 #<-SLIDE(2 to 50 by 1)\ntau_s       = 0.100 #<-SLIDE(0.010 to 1 by 0.01)\n\ndef getGainBias(maxRate, intercept, tau_rc, tau_ref, v_th):\n    gain = v_th * (1 - 1 / (1 - np.exp((tau_ref - 1/maxRate) / tau_rc))) / (intercept - 1)\n    bias = v_th - gain * intercept\n\n    return gain, bias\n\nclass FirstOrderLIF: # First Order Leaky Integrate and Fire\n    def __init__(self, tau_rc=0.2, tau_ref=0.002, v_init=0, v_th=1):\n        self.tau_rc  = tau_rc  # Potential decay time constant\n        self.v       = v_init  # Potential value\n        self.v_th    = v_th    # Firing threshold\n        self.tau_ref = tau_ref # Refractory period time constant\n\n        self.output          = 0 # Current output value\n        self.refractory_time = 0 # Current refractory period time (how long until the neuron can fire again)\n    \n    def step(self, I, t_step): # Advance one time step (input I and time step size t_step)\n        self.refractory_time -= t_step # Subtract the amount of time that passed from our refractory time\n\n        if self.refractory_time < 0: # If the neuron is not in its refractory period\n            self.v = self.v * (1 - t_step / self.tau_rc) + I * t_step / self.tau_rc # Integrate the input current\n        \n        if self.v > self.v_th: # If the potential is above the threshold\n            self.refractory_time = self.tau_ref # Enter the refractory period\n            self.output = 1 / t_step            # Emit a spike\n            self.v = 0                          # Reset the potential\n        else: # If the potential is below the threshold\n            self.output = 0 # Do not fire\n        \n        return self.output\n    \n    def reset(self): # Reset the neuron to its initial state\n        self.v = self.output = self.refractory_time = 0\n\nclass FirstOrderSynapse:\n    def __init__(self, tau_s=0.01):\n        self.tau_s  = tau_s # Synaptic time constant\n        self.output = 0     # Current potential\n\n    def step(self, I, t_step):\n        self.output = self.output * (1 - t_step / self.tau_s) + I * t_step / self.tau_s # Decay potential\n        return self.output\n    \n    def reset(self): # Reset the synapse to its initial state\n        self.output = 0\n\n\nclass FirstOrderLIFCollection: # Collection of First Order Leaky Integrate and Fire Neurons\n    def __init__(self, num_neurons, tau_rc=0.02, tau_ref=0.002, v_th=1, max_rate_range = (200, 400), intercept_range = (-1, 1), encoder_options = (-1, 1)):\n        self.neurons  = [] # List of neurons\n        self.gains    = [] # List of gains (numbers)\n        self.biases   = [] # List of biases (numbers)\n        self.encoders = [] # List of encoders (numbers)\n\n        for _ in range(num_neurons):\n            neuron = FirstOrderLIF(tau_rc=tau_rc, tau_ref=tau_ref, v_th=v_th)\n            max_rate  = np.random.uniform(max_rate_range[0], max_rate_range[1])   # Maximum firing rate\n            intercept = np.random.uniform(intercept_range[0], intercept_range[1]) # Intercept (where the neuron starts firing)\n            encoder   = np.random.choice(encoder_options)                         # Encoder (direction of the neuron's tuning curve) \n\n            gain, bias = getGainBias(max_rate, intercept, tau_rc, tau_ref, v_th)\n\n            self.neurons.append(neuron)\n            self.gains.append(gain)\n            self.biases.append(bias)\n            self.encoders.append(encoder)\n    \n    def step(self, I, t_step):\n        outputs = []\n        for neuron, gain, bias, encoder in zip(self.neurons, self.gains, self.biases, self.encoders): # Loop over neurons, gains, biases, and encoders\n            output = neuron.step(I * gain * encoder + bias, t_step) # Step the neuron with the input scaled by the gain and encoder, plus the bias\n            outputs.append(output) # Append the output to the list of outputs\n        return outputs\n    \n    def reset(self): # Reset all neurons to their initial state\n        for neuron in self.neurons:\n            neuron.reset()\n\n\nclass FirstOrderSynapseCollection:\n    def __init__(self, num_neurons, tau_s=0.05):\n        self.synapses = [FirstOrderSynapse(tau_s) for _ in range(num_neurons)]\n    \n    def step(self, inputs, t_step):\n        outputs = []\n        for i, synapse in enumerate(self.synapses):\n            inp = inputs[i]\n            output = synapse.step(inp, t_step)\n            outputs.append(output)\n        return outputs\n    \n    def reset(self):\n        for synapse in self.synapses:\n            synapse.reset()\n\nlifs = FirstOrderLIFCollection(NUM_NEURONS, max_rate_range=(25, 100))\nsynapses = FirstOrderSynapseCollection(NUM_NEURONS, tau_s=tau_s)\n\ndef signal(t):\n    return math.sin(t)\n\ndef step(lifs, synapses, input_value, t_step):\n    lif_outputs     = lifs.step(input_value, t_step)\n    synapse_outputs = synapses.step(lif_outputs, t_step)\n    return synapse_outputs\n\n\ndef getDecoders(lifs, minJ=-1, maxJ=1, stepSize=0.01):\n\n    def analyticalRate(neuron, I):\n        if I <= neuron.v_th: return 0\n        else:                return 1 / (neuron.tau_ref - neuron.tau_rc * np.log(1 - neuron.v_th/I))\n\n    inputs = np.arange(minJ, maxJ, stepSize)\n\n    # tuningCurves = computeTuningCurves(lifs, inputs)\n    tuningCurves = []\n    for neuron, gain, bias, encoder in zip(lifs.neurons, lifs.gains, lifs.biases, lifs.encoders):\n        tuningCurves.append([analyticalRate(neuron, i * gain * encoder + bias) for i in inputs])\n\n    A = np.array(tuningCurves)\n\n    value = np.expand_dims(inputs, axis=1)\n    Gamma = A @ A.T + np.identity(len(lifs.neurons))\n    GammaInv = np.linalg.inv(Gamma)\n    Upsilon = A @ value\n\n    Phi = GammaInv @ Upsilon\n\n    return Phi\n\nPhi = getDecoders(lifs)\n\nT_step = 0.001\nT = np.arange(0, 12, T_step)\n\nsignals = []\noutputs = []\nfor t in T:\n    input_value = signal(t)\n    out = step(lifs, synapses, input_value, T_step)\n    signals.append(input_value)\n    outputs.append(out)\n\nplt.figure()\nplt.plot(T, outputs @ Phi) # Multiply the outputs by the decoders with matrix multiplication\nplt.plot(T, signals, linestyle='--')\nplt.xlabel('Time (s)')\nplt.ylabel('Signal')\nplt.title('Signal vs Time')\nplt.legend(['Decoded Signal', 'Input Signal'])\nplt.show()&quot;"
-                                          id             = "editor-8-hash-737526494346743466"
+                                          id             = "editor-8-hash3597589049155524469"
                                           ></div><section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
 <ul class="simple">

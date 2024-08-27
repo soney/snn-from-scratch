@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -64,22 +61,10 @@
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/05 - Implementing Firing';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Firing Rates and Tuning Curves" href="06%20-%20Firing%20Rates%20and%20Tuning%20Curves.html" />
@@ -621,7 +606,7 @@ document.write(`
                                           data-arguments = "[&quot;python&quot;]"
                                           data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;600px&quot;}"
                                           data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\n\n# Simulation parameters\nv_th    = 1.000 # Threshold voltage for neuron <-SLIDE(0.1 to 1 by 0.001)\ntau_ref = 0.200 # Refractory period for neuron <-SLIDE(0 to 2 by 0.001)\ntau_rc  = 0.10  # Time constant for neuron     <-SLIDE(0.01 to 1.2 by 0.01)\n\nduration = 6   # Duration of the simulation\nT_step = 0.001 # Time step size\n\nclass FirstOrderLIF: # # First Order Leaky Integrate and Fire\n    def __init__(self, tau_rc=0.2, tau_ref=0.002, v_init=0, v_th=1):\n        self.tau_rc  = tau_rc  # Potential decay time constant\n        self.v       = v_init  # Potential value\n        self.v_th    = v_th    # Firing threshold\n        self.tau_ref = tau_ref # Refractory period time constant\n\n        self.output          = 0 # Current output value\n        self.refractory_time = 0 # Current refractory period time (how long until the neuron can fire again)\n    \n    def step(self, I, t_step): # Advance one time step (input I and time step size t_step)\n        self.refractory_time -= t_step # Subtract the amount of time that passed from our refractory time\n\n        if self.refractory_time < 0: # If the neuron is not in its refractory period\n            self.v = self.v * (1 - t_step / self.tau_rc) + I * t_step / self.tau_rc # Integrate the input current\n        \n        if self.v > self.v_th: # If the potential is above the threshold\n            self.refractory_time = self.tau_ref # Enter the refractory period\n            self.output = 1 / t_step            # Emit a spike\n            self.v = 0                          # Reset the potential\n        else: # If the potential is below the threshold\n            self.output = 0 # Do not fire\n        \n        return self.output\n\ntimes = np.arange(1, duration, T_step) # Create a range of time values\n\nneuron = FirstOrderLIF(tau_rc=tau_rc, tau_ref=tau_ref, v_th=v_th) # Create a new LIF neuron\n\ndef square_wave(t): # Our input current function will be a square wave\n    return 0 if (t % 2) < 1 else 1.1\n\nI_history = []\nv_history = []\noutput_history = []\nvth_history = []\n\nfor t in times: # Iterate over each time step\n    I = square_wave(t)     # Get the input current at this time\n    neuron.step(I, T_step) # Advance the neuron one time step\n\n    I_history.append(I)    # Record the input current\n    v_history.append(neuron.v) # Record the neuron's potential\n    output_history.append(neuron.output * T_step / 10) # Record the neuron's output (scaled)\n    vth_history.append(neuron.v_th) # Record the neuron's threshold\n\n\nplt.figure() # Create a new figure\nplt.plot(times, I_history, color=\&quot;grey\&quot;, linestyle=\&quot;--\&quot;)\nplt.plot(times, vth_history, color=\&quot;green\&quot;, linestyle=\&quot;--\&quot;)\nplt.plot(times, v_history)\nplt.plot(times, output_history, color=\&quot;red\&quot;, linewidth=2.5)\nplt.xlabel('Time (s)') # Label the x-axis\nplt.legend(['Input current', 'neuron.v_th', 'neuron.v', 'neuron.output']) # Add a legend\nplt.show() # Display the plot&quot;"
-                                          id             = "editor-5-hash7158548397107001975"
+                                          id             = "editor-5-hash3077094735118826326"
                                           ></div><section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>
 <ul class="simple">

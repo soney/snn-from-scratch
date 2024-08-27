@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -64,22 +61,10 @@
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/03 - Basic Neuron Models';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="First-Order Approximations of LI Neurons" href="04%20-%20First%20Order%20LI.html" />
@@ -473,14 +458,14 @@ document.write(`
                                           data-arguments = "[]"
                                           data-options   = "{}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "static-bucket-1-hash6639923263571723337"
+                                          id             = "static-bucket-1-hash-8746514286489854841"
                                           ></div><p>Now, imagine that we poke a small hole in the rubber bottom of this bucket. When we fill the bucket with water, it will slowly leak out of the hole in the bottom. If we add more water, the hole in the rubber expands and lets out more water. This leakiness represents the fact that in biological neurons, the membrane potential decreases over time without additional inputs.</p>
 <p>Try clicking the “Add water” button below quickly and watch the speed at which the water leaks out of the bucket. Note how it leaks out much more quickly when the bucket is full than when it is empty.</p>
 <div class="custom---leaky-bucket"
                                           data-arguments = "[]"
                                           data-options   = "{&quot;fires&quot;: &quot;False&quot;}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "leaky-bucket-1-hash3791583164863488268"
+                                          id             = "leaky-bucket-1-hash8513297907367824223"
                                           ></div><p>Throughout these tutorials, we will ease into a mathematical notation to represent the state (status) and dynamics (change over time) of neurons. We will refer to the potential as <span class="math notranslate nohighlight">\(v\)</span> (for <em>v</em>oltage). Because this potential changes over time, we will represent it as a function of time, <span class="math notranslate nohighlight">\(t\)</span>:</p>
 <ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(v(t)\)</span>: The potential of the neuron (how full the bucket is) at time <span class="math notranslate nohighlight">\(t\)</span></p></li>
@@ -513,19 +498,19 @@ v'(t) = \frac{1}{\tau}I(t) - \frac{1}{\tau}v(t)
                                           data-arguments = "[]"
                                           data-options   = "{&quot;fires&quot;: &quot;False&quot;, &quot;tau_rc&quot;: &quot;500&quot;, &quot;button_selector&quot;: &quot;#add-water&quot;}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "leaky-bucket-2-hash8017536301200099886"
+                                          id             = "leaky-bucket-2-hash-5145713216680108415"
                                           ></div><p><span class="math notranslate nohighlight">\(\tau = 1000\)</span>:</p>
 <div class="custom---leaky-bucket"
                                           data-arguments = "[]"
                                           data-options   = "{&quot;fires&quot;: &quot;False&quot;, &quot;tau_rc&quot;: &quot;1000&quot;, &quot;button_selector&quot;: &quot;#add-water&quot;}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "leaky-bucket-3-hash6310171309708184787"
+                                          id             = "leaky-bucket-3-hash4215786557390707883"
                                           ></div><p><span class="math notranslate nohighlight">\(\tau = 3000\)</span>:</p>
 <div class="custom---leaky-bucket"
                                           data-arguments = "[]"
                                           data-options   = "{&quot;fires&quot;: &quot;False&quot;, &quot;tau_rc&quot;: &quot;3000&quot;, &quot;button_selector&quot;: &quot;#add-water&quot;}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "leaky-bucket-4-hash-5984932973341805779"
+                                          id             = "leaky-bucket-4-hash-5438240613141704444"
                                           ></div><details class="sd-sphinx-override sd-dropdown sd-card sd-mb-3" id="ssec-circuit-model">
 <summary class="sd-summary-title sd-card-header">
 <span class="sd-summary-text">The Circuit Model (Optional)</span><span class="sd-summary-state-marker sd-summary-chevron-right"><svg version="1.1" width="1.5em" height="1.5em" class="sd-octicon sd-octicon-chevron-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.72 18.78a.75.75 0 0 1 0-1.06L14.44 12 8.72 6.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 0 1-1.06 0Z"></path></svg></span></summary><div class="sd-summary-content sd-card-body docutils">
@@ -560,7 +545,7 @@ v'(t) = \frac{1}{\tau}I(t) - \frac{1}{\tau}v(t)
                                           data-arguments = "[]"
                                           data-options   = "{&quot;fires&quot;: &quot;True&quot;}"
                                           data-content   = "&quot;&quot;"
-                                          id             = "leaky-bucket-5-hash445413002828884884"
+                                          id             = "leaky-bucket-5-hash2241927964949911612"
                                           ></div></section>
 <section id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h2>

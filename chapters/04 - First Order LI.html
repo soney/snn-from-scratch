@@ -34,9 +34,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Vibur" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyterlite_sphinx.css?v=ca70e7f1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/style.css?v=474c4726" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -50,7 +48,6 @@
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/jupyterlite_sphinx.js?v=d6bdf5f8"></script>
     <script>let toggleHintShow = 'Click to show';</script>
     <script>let toggleHintHide = 'Click to hide';</script>
     <script>let toggleOpenOnPrint = 'true';</script>
@@ -64,22 +61,10 @@
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'chapters/04 - First Order LI';</script>
-    <script src="../_static/node_path.javascript-components.js?v=dc45c0eb"></script>
-    <script src="../_static/node_child_process.javascript-components.js?v=7977704d"></script>
-    <script src="../_static/node_fs_promises.javascript-components.js?v=3c0e4c8b"></script>
-    <script src="../_static/_296d.javascript-components.js?v=1e0d8dcf"></script>
-    <script src="../_static/javascript-components.js?v=d6c9e07e"></script>
-    <script src="../_static/node_crypto.javascript-components.js?v=78625931"></script>
-    <script src="../_static/vendors-node_modules_codemirror_lang-python_dist_index_js.javascript-components.js?v=323e0b93"></script>
-    <script src="../_static/node_fs.javascript-components.js?v=6621ea80"></script>
-    <script src="../_static/node_url.javascript-components.js?v=983f4b01"></script>
-    <script src="../_static/pyodide.js?v=94982383"></script>
-    <script src="../_static/node_vm.javascript-components.js?v=ee249cc5"></script>
-    <script src="../_static/pyodide/module_webworker_dev.js?v=40d5ace9"></script>
-    <script src="../_static/pyodide/webworker_dev.js?v=10c66e99"></script>
+    <script src="../_static/javascript-components.js?v=a8af3629"></script>
     <script src="../_static/pyodide/webworker.js?v=10c66e99"></script>
     <script src="../_static/pyodide/pyodide.asm.js?v=77e5d317"></script>
-    <script src="../_static/pyodide/pyodide.js?v=94982383"></script>
+    <script src="../_static/pyodide/pyodide.js?v=be10f41f"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Implementing Firing in LIF Neurons" href="05%20-%20Implementing%20Firing.html" />
@@ -452,10 +437,14 @@ document.write(`
 <p>We’re going to start by implementing a simulation of the leaky integrate-and-fire (LIF) neurons described in the previous page. We will implement our code in Python.</p>
 <p>Recall from <a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html"><span class="std std-doc">last time</span></a> that we have the formula <a class="reference internal" href="03%20-%20Basic%20Neuron%20Models.html#equation-eq-dvdt">(1)</a> describing the potential of a neuron as:</p>
 <div class="math notranslate nohighlight">
-\[v'(t) = \frac{1}{\tau}I(t) - \frac{1}{\tau}v(t)\]</div>
+\[
+v'(t) = \frac{1}{\tau}I(t) - \frac{1}{\tau}v(t)
+\]</div>
 <p>Because we are going to introduce other time constants, we will rename <span class="math notranslate nohighlight">\(\tau\)</span> to be <span class="math notranslate nohighlight">\(\tau_{rc}\)</span>:</p>
 <div class="math notranslate nohighlight" id="equation-eq-vprime">
-<span class="eqno">(2)<a class="headerlink" href="#equation-eq-vprime" title="Link to this equation">#</a></span>\[v'(t) = \frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t)\]</div>
+<span class="eqno">(2)<a class="headerlink" href="#equation-eq-vprime" title="Link to this equation">#</a></span>\[
+v'(t) = \frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t)
+\]</div>
 <section id="simulating-neurons-in-discrete-time">
 <span id="ssec-discrete-time-lif"></span><h2>Simulating Neurons in Discrete Time<a class="headerlink" href="#simulating-neurons-in-discrete-time" title="Link to this heading">#</a></h2>
 <p>So far, we have a definition of how <span class="math notranslate nohighlight">\(v(t)\)</span> changes over time (<span class="math notranslate nohighlight">\(v'(t)\)</span>) but we haven’t actually defined <span class="math notranslate nohighlight">\(v(t)\)</span> itself. We are going to <em>estimate</em> <span class="math notranslate nohighlight">\(v(t)\)</span> using <strong>discrete time</strong>, meaning we’ll split time into small time steps (like 0.001 seconds). We will refer to the amount of time that a step represents as <span class="math notranslate nohighlight">\(T_{step}\)</span>.</p>
@@ -475,23 +464,33 @@ v[t] &amp;= v[t-1] (1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}
 <h2 class="rubric" id="euler-s-approximation">Euler’s Approximation</h2>
 <p class="sd-card-text">If we already know <span class="math notranslate nohighlight">\(v(t)\)</span> and the rate of change <span class="math notranslate nohighlight">\(v'(t)\)</span> then for some small time increment <span class="math notranslate nohighlight">\(\Delta{}t\)</span>, we can estimate the value of <span class="math notranslate nohighlight">\(v(t+\Delta{}t)\)</span> as:</p>
 <div class="math notranslate nohighlight">
-\[v(t + \Delta{}t) \approx v(t) + v'(t)\Delta{}t\]</div>
+\[
+v(t + \Delta{}t) \approx v(t) + v'(t)\Delta{}t
+\]</div>
 <p class="sd-card-text">in our case, subbing in for <span class="math notranslate nohighlight">\(v'(t)\)</span> <a class="reference internal" href="#equation-eq-vprime">(2)</a> we have:</p>
 <div class="math notranslate nohighlight">
-\[v(t + \Delta{}t) \approx v(t) + (\frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t))\Delta{}t\]</div>
+\[
+v(t + \Delta{}t) \approx v(t) + (\frac{1}{\tau_{rc}}I(t) - \frac{1}{\tau_{rc}}v(t))\Delta{}t
+\]</div>
 <p class="sd-card-text">which can be re-arranged to:</p>
 <div class="math notranslate nohighlight" id="equation-eq-euler-vt">
-<span class="eqno">(4)<a class="headerlink" href="#equation-eq-euler-vt" title="Link to this equation">#</a></span>\[v(t + \Delta{}t) \approx v(t)(1 - \frac{\Delta{}t}{\tau_{rc}}) + \frac{\Delta{}t}{\tau_{rc}}I(t)\]</div>
+<span class="eqno">(4)<a class="headerlink" href="#equation-eq-euler-vt" title="Link to this equation">#</a></span>\[
+v(t + \Delta{}t) \approx v(t)(1 - \frac{\Delta{}t}{\tau_{rc}}) + \frac{\Delta{}t}{\tau_{rc}}I(t)
+\]</div>
 <p class="sd-card-text">Our estimate is usually most accurate if we use small values for <span class="math notranslate nohighlight">\(\Delta{}t\)</span>.</p>
 <h2 class="rubric" id="discrete-time-simulations">Discrete Time Simulations</h2>
 <p class="sd-card-text">Our definitions <span class="math notranslate nohighlight">\(v(t)\)</span> is one of a “continuous” function, meaning that <span class="math notranslate nohighlight">\(t\)</span> could be any arbitrarily precise positive number (in math notation, <span class="math notranslate nohighlight">\(t \in \mathbb{R}, t \ge 0\)</span>). However, when we simulate SNNs, we typically instead use “discrete” simulations, meaning that we split time into small time steps (like 0.001 seconds). We will refer to the amount of time that a step represents as <span class="math notranslate nohighlight">\(T_{step}\)</span> Then, rather than representing a precise time, <span class="math notranslate nohighlight">\(t\)</span> instead represents the step number and is a positive integer (<span class="math notranslate nohighlight">\(t \in \mathbb{N}\)</span>). We will use square brackets to indicate that we are modeling in discrete time: <span class="math notranslate nohighlight">\(v[t]\)</span>.</p>
 <p class="sd-card-text">Our definition of <span class="math notranslate nohighlight">\(v[t]\)</span> is an approximation of <span class="math notranslate nohighlight">\(v(t)\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[v[t] :\approx v(\frac{1}{T_{step}}t)\]</div>
+\[
+v[t] :\approx v(\frac{1}{T_{step}}t)
+\]</div>
 <p class="sd-card-text">Similarly, we will estimate our incoming potential (<span class="math notranslate nohighlight">\(I(t)\)</span>) in discrete time steps as <span class="math notranslate nohighlight">\(I[t]\)</span>.</p>
 <p class="sd-card-text">Now, suppose we choose a value of <span class="math notranslate nohighlight">\(T_{step}\)</span> that is small enough for our approximation using Euler’s method to be accurate. Then, we could take our formula from above <a class="reference internal" href="#equation-eq-euler-vt">(4)</a> and use <span class="math notranslate nohighlight">\(T_{step}\)</span> as <span class="math notranslate nohighlight">\(\Delta{}t\)</span>:</p>
 <div class="math notranslate nohighlight">
-\[v(t + T_{step}) \approx v(t)(1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}I(t)\]</div>
+\[
+v(t + T_{step}) \approx v(t)(1 - \frac{T_{step}}{\tau_{rc}}) + \frac{T_{step}}{\tau_{rc}}I(t)
+\]</div>
 <p class="sd-card-text">In discrete time, this means</p>
 <div class="math notranslate nohighlight">
 \[
@@ -707,7 +706,7 @@ Step 3: neuron2.v=0.075
                                           data-arguments = "[&quot;python&quot;]"
                                           data-options   = "{&quot;packages&quot;: &quot;matplotlib,numpy&quot;, &quot;run_on_load&quot;: &quot;True&quot;, &quot;max_height&quot;: &quot;500px&quot;}"
                                           data-content   = "&quot;import matplotlib.pyplot as plt\nimport numpy as np\n\n# Simulation parameters\nv_init =   0.6   # Initial voltage for neuron\ntau_rc =   0.500 # Time constant for neuron <-SLIDE(0.008 to 0.5 by 0.001)\nT_step =   0.010 # Time step size <-SLIDE(0.001 to 0.2 by 0.001)\ninput_func = \&quot;square-wave\&quot;  # Input function <-SELECT(\&quot;no-input\&quot;, \&quot;square-wave\&quot;)\n\nduration = 4     # Total time for simulation\n\ndef no_input(t): return 0 # No input function\ndef square_wave_input(t): return 1 if (t % 2) < 1 else 0 # Square wave function\n\nI_func = square_wave_input if input_func == \&quot;square-wave\&quot; else no_input\n\nclass FirstOrderLI: # First Order Leaky Integrate\n    def __init__(self, tau_rc=0.2, v_init=0): # Default values for tau_rc and v_init\n        self.tau_rc = tau_rc # Set instance variables\n        self.v = v_init\n\n    def step(self, I, t_step): # Advance one time step (input I and time step size t_step)\n        self.v = self.v * (1 - t_step / self.tau_rc) + I * t_step / self.tau_rc\n\nneuron = FirstOrderLI(tau_rc = tau_rc, v_init = v_init) # create an instance of FirstOrderLI\n\n# Time vector\ntimes = np.arange(0, duration, T_step)\nv_history = []\nI_history = []\n\n# Run the simulation\nfor t in times:\n    I = I_func(t)\n    neuron.step(I_func(t), T_step)\n    I_history.append(I)\n    v_history.append(neuron.v)\n\nplt.figure() # Create a new figure\nplt.plot(times, v_history) # Plot the neuron's potential over time\nplt.plot(times, I_history, color=\&quot;grey\&quot;, linestyle=\&quot;--\&quot;) # Plot the input current over time\nplt.xlabel('Time (s)') # Label the x-axis\nplt.ylabel('Neuron potential / Input current') # Label the y-axis\nplt.legend(['Neuron potential', 'Input current']) # Add a legend\nplt.show() # Display the plot&quot;"
-                                          id             = "editor-4-hash-6206257695150334152"
+                                          id             = "editor-4-hash350104578277993435"
                                           ></div><p>In the next section, we’ll introduce <strong>firing</strong>, to make our neurons proper LI<strong>F</strong> neurons.</p>
 </section>
 </section>
